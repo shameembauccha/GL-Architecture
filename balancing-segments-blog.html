@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why One Balancing Segment Was Never Enough | Simpl'IT Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0B08;--surface:#131009;--surface2:#1A1610;--surface3:#201C12;
+  --border:#28241A;--border2:#38342A;
+  --ink:#F0EAE0;--ink2:#C8C0B0;--ink3:#80786A;--ink4:#48443A;
+  --oracle:#C03010;--oracle-lt:#E04828;--oracle-pale:#280C04;--oracle-border:#581C0C;
+  --blue:#2060A8;--blue-lt:#3A80C8;--blue-pale:#08182A;--blue-border:#183860;
+  --gold:#C89010;--gold-lt:#E8B020;--gold-pale:#181200;--gold-border:#483200;
+  --green:#18683A;--green-lt:#28A060;--green-pale:#081408;--green-border:#184828;
+  --p1c:#2060A8;--p2c:#C03010;--p3c:#C89010;
+  --r:4px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.78;-webkit-font-smoothing:antialiased}
+
+/* ── NAV ── */
+.nav{background:var(--bg);border-bottom:1px solid var(--border);padding:14px 52px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:.01em}
+.nav-logo:hover{color:var(--gold-lt)}
+.nav-sep{color:var(--border2);margin:0 4px}
+.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);text-decoration:none}
+.nav-crumb:hover{color:var(--ink3)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.nav-contact{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border:1px solid var(--oracle-border);color:var(--oracle);border-radius:2px;text-decoration:none;transition:all .18s}
+.nav-contact:hover{background:var(--oracle);color:#fff;border-color:var(--oracle)}
+
+/* ── SERIES BAR ── */
+.series-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:9px 52px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.sb-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink4)}
+.sb-sep{color:var(--border2)}
+.sb-link{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-lt);text-decoration:none;transition:color .15s}
+.sb-link:hover{color:var(--gold-lt)}
+.sb-current{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--p1c);font-weight:500}
+.sb-all{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);text-decoration:none;padding:3px 10px;border:1px solid var(--border2);border-radius:2px;transition:all .15s}
+.sb-all:hover{color:var(--ink2);border-color:var(--border2)}
+
+/* ── HERO ── */
+.hero{padding:72px 52px 64px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 90% 40%,#20406018,transparent 65%);pointer-events:none}
+.hero-inner{max-width:760px;position:relative;z-index:1}
+.hero-series{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--p1c);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.hero-series::before{content:'';display:inline-block;width:24px;height:1px;background:var(--p1c)}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(32px,5.5vw,56px);font-weight:900;color:var(--ink);line-height:1.08;letter-spacing:-.02em;margin-bottom:20px}
+.hero h1 em{font-style:italic;color:var(--gold-lt)}
+.hero-deck{font-size:20px;font-style:italic;color:var(--ink3);line-height:1.65;max-width:640px;margin-bottom:36px}
+.hero-meta{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding-top:24px;border-top:1px solid var(--border)}
+.hero-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p1c),var(--blue-lt));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.hero-author{display:flex;flex-direction:column;gap:2px}
+.hero-author-name{font-family:'Source Serif 4',serif;font-size:14px;font-weight:600;color:var(--ink);text-decoration:none;transition:color .15s}
+.hero-author-name:hover{color:var(--blue-lt)}
+.hero-author-role{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4)}
+.hero-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink4);margin-left:auto}
+
+/* ── LAYOUT ── */
+.wrap{display:grid;grid-template-columns:1fr 280px;max-width:1160px;margin:0 auto;align-items:start}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.sidebar{display:none}.hero,.nav,.series-bar{padding-left:24px;padding-right:24px}}
+
+/* ── ARTICLE ── */
+.article{padding:52px 52px 96px;max-width:760px}
+.article h2{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--ink);margin:56px 0 16px;line-height:1.2;letter-spacing:-.01em}
+.article h2:first-child{margin-top:0}
+.article h2 .step-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink4);display:block;margin-bottom:6px;font-weight:400;letter-spacing:.1em}
+.article h3{font-family:'Source Serif 4',serif;font-size:18px;font-weight:600;color:var(--ink2);margin:32px 0 12px}
+.article p{color:var(--ink2);margin-bottom:20px;font-size:17px;line-height:1.78}
+.article p:last-child{margin-bottom:0}
+.article ul,.article ol{padding-left:22px;color:var(--ink2);margin-bottom:18px;font-size:16px}
+.article li{margin-bottom:8px;line-height:1.7}
+.article a{color:var(--blue-lt);text-decoration:underline;text-underline-offset:3px}
+.article a:hover{color:var(--gold-lt)}
+.lead{font-size:20px;font-style:italic;color:var(--ink2);border-left:3px solid var(--p1c);padding-left:24px;margin-bottom:32px;line-height:1.72}
+hr.rule{border:none;border-top:1px solid var(--border);margin:48px 0}
+strong{color:var(--ink);font-weight:600}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);color:var(--blue-lt);padding:1px 6px;border-radius:2px;border:1px solid var(--border)}
+
+/* ── PULL QUOTE ── */
+.pull-quote{background:var(--surface2);border-left:3px solid var(--p1c);padding:28px 32px;margin:36px 0;position:relative}
+.pull-quote p{font-size:19px;font-style:italic;color:var(--ink2);margin:0 0 10px;line-height:1.65}
+.pull-quote cite{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);display:block}
+
+/* ── CALLOUT ── */
+.callout{border-radius:var(--r);padding:16px 20px;margin:24px 0;display:flex;gap:12px;align-items:flex-start}
+.callout-icon{font-size:14px;flex-shrink:0;margin-top:2px}
+.callout-body{flex:1}
+.callout-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;display:block;font-weight:500}
+.callout-body p{font-size:14px;color:var(--ink2);margin:0;line-height:1.65}
+.c-oracle{background:var(--oracle-pale);border:1px solid var(--oracle-border)}
+.c-oracle .callout-label{color:var(--oracle)}
+.c-blue{background:var(--blue-pale);border:1px solid var(--blue-border)}
+.c-blue .callout-label{color:var(--blue-lt)}
+.c-gold{background:var(--gold-pale);border:1px solid var(--gold-border)}
+.c-gold .callout-label{color:var(--gold-lt)}
+
+/* ── STAT STRIP ── */
+.stat-strip{background:var(--p1c);border-radius:var(--r);padding:28px 32px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:36px 0}
+@media(max-width:600px){.stat-strip{grid-template-columns:1fr 1fr}}
+.stat-item{text-align:center}
+.stat-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:#fff;display:block;line-height:1;margin-bottom:5px}
+.stat-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#ffffff80;line-height:1.5}
+
+/* ── WORKAROUND CARDS ── */
+.wk-cards{display:flex;flex-direction:column;gap:12px;margin:20px 0}
+.wk-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--oracle);border-radius:0 var(--r) var(--r) 0;padding:16px 20px}
+.wk-card h4{font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.wk-card p{font-size:14px;color:var(--ink3);margin:0;line-height:1.65}
+
+/* ── COMPARISON TABLE ── */
+.comp-table{width:100%;border-collapse:collapse;font-size:13px;margin:20px 0}
+.comp-table th{background:var(--surface3);color:var(--ink3);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:9px 12px;text-align:left;border-bottom:1px solid var(--border2)}
+.comp-table td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5;color:var(--ink2)}
+.comp-table tr:last-child td{border-bottom:none}
+.comp-table tr:nth-child(even) td{background:var(--surface)}
+.comp-table td:first-child{font-weight:600;color:var(--ink)}
+.ct-yes{color:var(--green-lt);font-family:'JetBrains Mono',monospace;font-size:11px}
+.ct-no{color:var(--oracle);font-family:'JetBrains Mono',monospace;font-size:11px}
+
+/* ── STEP LIST ── */
+.step-list{display:flex;flex-direction:column;gap:0;margin:20px 0}
+.step-item{display:flex;gap:0;align-items:stretch}
+.step-line{display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0}
+.step-circle{width:30px;height:30px;border-radius:50%;background:var(--p1c);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:#fff;flex-shrink:0;margin-top:2px}
+.step-connector{flex:1;width:1px;background:var(--border);margin:4px 0}
+.step-item:last-child .step-connector{display:none}
+.step-content{padding:0 0 24px 16px;flex:1}
+.step-content h4{font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.step-content p{font-size:14px;color:var(--ink3);line-height:1.65;margin:0}
+
+/* ── CLOSING ── */
+.closing{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:40px 44px;margin:48px 0 0}
+.closing h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--ink);margin-bottom:18px}
+.closing p{font-size:17px;color:var(--ink3);line-height:1.8;margin-bottom:16px}
+.closing-sig{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);display:block;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+
+/* ── CTA BLOCK ── */
+.cta-block{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:24px 28px;margin:28px 0;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.cta-text h4{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.cta-text p{font-size:14px;color:var(--ink3);margin:0;line-height:1.55}
+.cta-btn{flex-shrink:0;background:var(--oracle);color:#fff;padding:11px 22px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:background .18s;white-space:nowrap}
+.cta-btn:hover{background:var(--oracle-lt);color:#fff}
+.cta-btn-blue{background:var(--blue-lt)}
+.cta-btn-blue:hover{background:#4A90D8}
+
+/* ── SIDEBAR ── */
+.sidebar{padding:40px 28px 80px;border-left:1px solid var(--border);position:sticky;top:0;max-height:100vh;overflow-y:auto}
+.sb-widget{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.sb-widget-header{background:var(--surface2);padding:9px 16px;border-bottom:1px solid var(--border)}
+.sb-widget-header span{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4)}
+.sb-widget-body{padding:14px 16px}
+.toc-list{list-style:none;padding:0}
+.toc-list li{border-bottom:1px solid var(--border)}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{display:flex;gap:8px;align-items:flex-start;padding:9px 0;font-size:13px;color:var(--ink3);text-decoration:none;font-family:'Source Serif 4',serif;line-height:1.4}
+.toc-list a:hover{color:var(--blue-lt)}
+.toc-num{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink4);flex-shrink:0;margin-top:2px}
+.sb-link-item{display:flex;gap:8px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);text-decoration:none}
+.sb-link-item:last-child{border-bottom:none;padding-bottom:0}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--oracle);flex-shrink:0;margin-top:6px}
+.sb-dot-blue{background:var(--blue-lt)}
+.sb-dot-gold{background:var(--gold-lt)}
+.sb-dot-p1{background:var(--p1c)}
+.sb-dot-p2{background:var(--p2c)}
+.sb-dot-p3{background:var(--p3c)}
+.sb-link-item span{font-size:12px;color:var(--ink3);line-height:1.4}
+.sb-link-item:hover span{color:var(--blue-lt)}
+.sb-widget-body p{font-size:13px;color:var(--ink3);margin-bottom:8px;line-height:1.55}
+.sb-widget-body p strong{color:var(--ink2)}
+.category-pill{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:3px 9px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-lt);margin:2px;text-decoration:none}
+.category-pill:hover{border-color:var(--blue-border);color:var(--gold-lt)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.hero-inner{animation:fadeUp .55s ease both}
+.article{animation:fadeUp .6s .08s ease both}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-logo" href="https://simplitconsulting.com">Simpl'IT Consulting</a>
+  <span class="nav-sep">›</span>
+  <a class="nav-crumb" href="https://simplitconsulting.com/blog">Blog</a>
+  <span class="nav-sep">›</span>
+  <a class="nav-crumb" href="https://simplitconsulting.com/blog">Finance in Oracle</a>
+  <div class="nav-right">
+    <!-- TO BE DESIGNED: Get in Touch page -->
+    <a class="nav-contact" href="https://simplitconsulting.com/contact/">Get in Touch</a>
+  </div>
+</nav>
+
+<!-- SERIES BAR -->
+<div class="series-bar">
+  <span class="sb-label">GL Architecture Series</span>
+  <span class="sb-sep">·</span>
+  <span class="sb-current">Part 1 — Balancing Segments (this article)</span>
+  <span class="sb-sep">·</span>
+  <a class="sb-link" href="https://simplitconsulting.com/the-ledger-that-runs-in-parallel/">Part 2 — Secondary Ledgers</a>
+  <span class="sb-sep">·</span>
+  <a class="sb-link" href="https://simplitconsulting.com/what-is-a-ledger/">Part 3 — What Is a Ledger?</a>
+  <a class="sb-all" href="https://simplitconsulting.com/gl-architecture-series/">View full series →</a>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-series">Part 1 of 3 · Oracle Fusion GL Architecture Series</div>
+    <h1>Why One Balancing Segment<br>Was <em>Never Enough</em></h1>
+    <p class="hero-deck">How Oracle Fusion's secondary and tertiary balancing segments solve a decades-old architectural limitation in Oracle EBS R12 — and what it means for finance teams across every major industry.</p>
+    <div class="hero-meta">
+      <div class="hero-avatar">SB</div>
+      <div class="hero-author">
+        <a class="hero-author-name" href="https://www.linkedin.com/in/shameemakhtar/" target="_blank" rel="noopener">Shameem Bauccha</a>
+        <span class="hero-author-role">Oracle Fusion GL · Chart of Accounts · Finance Transformation</span>
+      </div>
+      <span class="hero-date">February 2026 · 14 min read</span>
+    </div>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div class="wrap">
+<main class="article">
+
+  <p class="lead">A balancing segment is one of the most fundamental concepts in Oracle General Ledger — the dimension at which the system enforces that debits equal credits. In Oracle EBS R12, organisations had exactly one. In Oracle Fusion Cloud ERP, they can have three. That difference, from one to three, resolves one of the most persistent, costly, and operationally damaging limitations in the history of Oracle's GL architecture.</p>
+
+  <p>This article explains what that limitation was, why it matters now more than ever, and what organisations need to know to implement multiple balancing segments correctly.</p>
+
+  <hr class="rule">
+
+  <h2 id="s1">The R12 Constraint: One Dimension to Balance Them All</h2>
+
+  <p>Oracle EBS R12 was built on a hard architectural constraint: the General Ledger supports only one balancing segment, typically mapped to the Legal Entity or Company. Everything else — funds, branches, properties, projects, programs, cost centers — exists in the GL as a reporting dimension only. The system enforces balance at the company level. It enforces nothing below it.</p>
+
+  <p>For straightforward organisations with a small number of legal entities, this was manageable. But modern organisations are rarely straightforward. A bank has hundreds of branches, each a profit center with its own loan book, deposit base, and inter-branch funding position. A government entity manages dozens of funds, each with strict legal accountability under GASB standards. A construction company runs multiple projects simultaneously, each with its own project finance lenders and covenant requirements. A nonprofit manages restricted and unrestricted funds that must never be commingled.</p>
+
+  <div class="pull-quote">
+    <p>The business does not just need a P&L by dimension — it needs a fully balanced, auditable set of financial statements at that dimension. A P&L without a balance sheet is incomplete. A balance sheet that does not balance is meaningless.</p>
+  </div>
+
+  <p>In all of these cases, R12 could not deliver this natively. And so organisations were forced to choose between three painful workarounds — none of them satisfactory, all of them costly.</p>
+
+  <div class="wk-cards">
+    <div class="wk-card">
+      <h4>Workaround 1 — Operating Unit Explosion</h4>
+      <p>Create a separate Operating Unit for every entity requiring its own financial statements. One OU per branch, per property, per fund. A bank with 200 branches needed 200 Operating Units — 200 period closes, 200 setups, 200 reporting configurations. Implementation costs ballooned. What started as a solution became its own problem.</p>
+    </div>
+    <div class="wk-card">
+      <h4>Workaround 2 — Manual Inter-Unit Journal Entries</h4>
+      <p>Manually create due-to and due-from entries at period end to force balance at the required dimension. Time-consuming, error-prone, and entirely dependent on individual knowledge. When staff turned over, the logic lived in their heads — not in the system. Auditors flagged these manual entries. Reconciliation consumed days every close cycle.</p>
+    </div>
+    <div class="wk-card">
+      <h4>Workaround 3 — Shadow Accounting in Spreadsheets</h4>
+      <p>Abandon the GL for sub-entity reporting and maintain parallel books in spreadsheets or specialised systems. Reconciling the two was a recurring burden. And when auditors asked for support, the answer was a spreadsheet, not a system report — a response that increasingly fails to satisfy modern audit standards.</p>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <h2 id="s2">Why This Matters More Now Than It Did in 2010</h2>
+
+  <p>The R12 workarounds existed for years. Several forces are now converging to make that tolerance untenable.</p>
+
+  <p><strong>Regulatory pressure is intensifying.</strong> GASB, IFRS 17, FERC, DCAA, CMS — regulators across every industry are demanding more granular, auditable financial data, faster. Organisations that produce their regulatory submissions from spreadsheets are increasingly exposed to challenge, delay, and restatement risk.</p>
+
+  <p><strong>Investor and lender expectations have risen.</strong> Private equity owners want property-level or fund-level financials. Project lenders require contract-level balance sheets as a condition of financing. JV partners demand auditable financials at the asset level. None of these can be produced natively from R12 without workarounds.</p>
+
+  <p><strong>Audit standards are evolving.</strong> Auditors increasingly require that financial statements be traceable to system-generated entries, not manual journals or spreadsheet models. The workarounds that passed audit in 2010 are under far greater scrutiny today.</p>
+
+  <hr class="rule">
+
+  <h2 id="s3">The Oracle Fusion Answer</h2>
+
+  <p>Oracle Fusion Cloud ERP resolves this architectural limitation natively by introducing secondary and tertiary balancing segments. Organisations can now designate up to three dimensions in their Chart of Accounts as balancing segments. The system automatically generates the intracompany balancing lines needed to ensure every one of those dimensions carries a fully balanced set of financial statements — in real time, with a complete audit trail, and without any manual intervention.</p>
+
+  <div class="stat-strip">
+    <div class="stat-item"><span class="stat-num">70–80%</span><span class="stat-lbl">Reduction in period-end manual balancing journals</span></div>
+    <div class="stat-item"><span class="stat-num">50–65%</span><span class="stat-lbl">Faster month-end close across industries</span></div>
+    <div class="stat-item"><span class="stat-num">~95%</span><span class="stat-lbl">Reduction in operating unit sprawl</span></div>
+    <div class="stat-item"><span class="stat-num">40–60%</span><span class="stat-lbl">Less IT customisation at implementation</span></div>
+  </div>
+
+  <p>Across every major industry, the same pattern emerges: a sub-entity dimension that needs to balance independently, a GL that cannot enforce it, and a workaround that costs more than the problem it was meant to solve.</p>
+
+  <hr class="rule">
+
+  <h2 id="s4">A Critical Distinction: Intracompany vs Intercompany</h2>
+
+  <p>One of the most common configuration mistakes when implementing secondary and tertiary balancing segments is confusing intracompany balancing rules with intercompany balancing rules. They are fundamentally different — and only one of them is required for secondary and tertiary balancing segments to work.</p>
+
+  <table class="comp-table">
+    <thead><tr><th>Dimension</th><th>Intercompany</th><th>Intracompany</th></tr></thead>
+    <tbody>
+      <tr><td>Triggered by</td><td>Transaction crosses legal entities</td><td>Transaction crosses balancing segment values within the same legal entity</td></tr>
+      <tr><td>Driven by</td><td>Primary Balancing Segment</td><td>Secondary or Tertiary Balancing Segment</td></tr>
+      <tr><td>Entries generated</td><td>Intercompany receivable / payable</td><td>Due-To / Due-From entries</td></tr>
+      <tr><td>Multiple legal entities?</td><td class="ct-yes">Yes</td><td class="ct-no">No — same entity</td></tr>
+      <tr><td>Required for secondary / tertiary?</td><td class="ct-no">No</td><td class="ct-yes">Yes — mandatory</td></tr>
+      <tr><td>Where configured</td><td>Manage Intercompany Balancing Rules</td><td>Manage Intracompany Balancing Rules</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout c-oracle">
+    <span class="callout-icon">⚠</span>
+    <div class="callout-body">
+      <span class="callout-label">Implementation Note</span>
+      <p>In Oracle Fusion's Setup and Maintenance, the Intracompany Balancing Rules setup sits within the <em>Intercompany</em> menu path. This causes frequent confusion during implementation. The intracompany rules are correctly located there and must be configured for any ledger using secondary or tertiary balancing segments. Without them, any journal that crosses balancing segment values will fail to post or route to suspense — making this a hard blocking dependency before any transaction processing can begin.</p>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <h2 id="s5">Configuration: The Nine Steps</h2>
+
+  <p>Implementing multiple balancing segments correctly requires a disciplined sequence. Skipping or reordering steps is the most common source of rework during GL implementation.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div>
+      <div class="step-content"><h4>Plan Your Chart of Accounts</h4><p>Clearly separate balancing requirements from reporting requirements before any configuration begins. Balancing requirements drive segment label designations. Once the CoA is assigned to a live ledger, balancing segment designations cannot be changed.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div>
+      <div class="step-content"><h4>Design the Chart of Accounts Structure</h4><p>Define the number of segments, their order, length, and format. Place the Primary Balancing Segment first — this is a Fusion best practice that affects downstream processing.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div>
+      <div class="step-content"><h4>Configure the Value Sets</h4><p>For each segment, define the Value Set type — Independent, Dependent, or Table-validated — along with format, length, and any segment-level security rules.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">4</div><div class="step-connector"></div></div>
+      <div class="step-content"><h4>Assign Segment Labels</h4><p>Assign Primary, Secondary, and Tertiary Balancing Segment labels. Each balancing label can be assigned to one segment only. Reserve secondary and tertiary designations for dimensions that genuinely require an independently balanced balance sheet.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">5</div><div class="step-connector"></div></div>
+      <div class="step-content"><h4>Deploy the Accounting Flexfield</h4><p>Deployment compiles the flexfield and makes it available for ledger assignment. A common mistake is completing configuration but failing to deploy before proceeding to ledger setup — causing errors that require rework.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">6</div><div class="step-connector"></div></div>
+      <div class="step-content"><h4>Flatten the Accounting Flexfield</h4><p>Flattening generates the denormalized structure that OTBI, Smart View, and Financial Reporting Studio use to query segment data. Must be performed after initial deployment and re-run after every subsequent hierarchy change.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">7</div><div class="step-connector"></div></div>
+      <div class="step-content"><h4>Create and Configure the Primary Ledger</h4><p>Assign the Chart of Accounts, Accounting Calendar, Ledger Currency, and Subledger Accounting method. Assign Legal Entities to Primary Balancing Segment values before any transaction processing begins.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">8</div><div class="step-connector"></div></div>
+      <div class="step-content"><h4>Configure Intracompany Balancing Rules</h4><p>Define the Due-To and Due-From accounts used when a journal entry crosses multiple values of a balancing segment. This is a hard blocking dependency — without it, cross-segment journals will error or route to suspense.</p></div>
+    </div>
+    <div class="step-item">
+      <div class="step-line"><div class="step-circle">9</div></div>
+      <div class="step-content"><h4>Configure Secondary Ledgers and Reporting Currency Ledgers</h4><p>Based on reporting requirements identified in Step 1, create Secondary Ledgers for statutory or group reporting that requires a different Chart of Accounts or accounting method. Both must be linked to the Primary Ledger and fully configured before period close activities begin.</p></div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <h2 id="s6">Closing Perspective</h2>
+
+  <div class="closing">
+    <p>Secondary and tertiary balancing segments are not a feature for edge cases. They are the architectural answer to a limitation that has forced finance teams across every major industry to build expensive, fragile workarounds for the better part of two decades. The move to Oracle Fusion Cloud ERP is an opportunity to retire those workarounds permanently — but only if the GL is designed correctly from the start.</p>
+    <p>The organisations that get this right will close faster, report more accurately, satisfy auditors more easily, and operate a finance function that is genuinely fit for the complexity of modern business. The organisations that replicate their R12 architecture in Fusion — one balancing segment, one OU per entity, shadow systems doing the real work — will simply carry their problems forward into a newer platform.</p>
+    <p>The choice is made at design time. It cannot easily be unmade after go-live.</p>
+    <span class="closing-sig">SB — <a href="https://www.linkedin.com/in/shameemakhtar/" target="_blank" rel="noopener" style="color:inherit">Shameem Bauccha</a> · Oracle Fusion GL · Chart of Accounts · Finance Transformation · February 2026</span>
+  </div>
+
+  <div class="cta-block">
+    <div class="cta-text">
+      <h4>Balancing Segments Explorer</h4>
+      <p>Interactive tool — explore how primary, secondary, and tertiary balancing segments work across different industry structures.</p>
+    </div>
+    <a href="https://shameembauccha.github.io/Gl-Architecture/balancing-segments-explorer-complete.html" class="cta-btn cta-btn-blue" target="_blank" rel="noopener">Open Explorer</a>
+  </div>
+
+  <div class="cta-block">
+    <div class="cta-text">
+      <h4>Multiple Balancing Segments — White Paper</h4>
+      <p>Full technical reference: configuration, use cases, intracompany rules, and design principles.</p>
+    </div>
+    <a href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Multiple-Balancing-Segments-White-Paper-v1.0.pdf" class="cta-btn" target="_blank" rel="noopener">Download PDF</a>
+  </div>
+
+</main>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+  <div class="sb-widget">
+    <div class="sb-widget-header"><span>In This Article</span></div>
+    <div class="sb-widget-body" style="padding:0 16px">
+      <ul class="toc-list">
+        <li><a href="#s1"><span class="toc-num">01</span>The R12 Constraint</a></li>
+        <li><a href="#s2"><span class="toc-num">02</span>Why It Matters More Now</a></li>
+        <li><a href="#s3"><span class="toc-num">03</span>The Oracle Fusion Answer</a></li>
+        <li><a href="#s4"><span class="toc-num">04</span>Intracompany vs Intercompany</a></li>
+        <li><a href="#s5"><span class="toc-num">05</span>Configuration: Nine Steps</a></li>
+        <li><a href="#s6"><span class="toc-num">06</span>Closing Perspective</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sb-widget">
+    <div class="sb-widget-header"><span>GL Architecture Series</span></div>
+    <div class="sb-widget-body" style="padding:0 16px 16px">
+      <a class="sb-link-item" href="https://simplitconsulting.com/why-one-balancing-segment-was-never-enough/">
+        <div class="sb-dot sb-dot-p1"></div><span>Part 1 — Balancing Segments (this article)</span>
+      </a>
+      <a class="sb-link-item" href="https://simplitconsulting.com/the-ledger-that-runs-in-parallel/">
+        <div class="sb-dot sb-dot-p2"></div><span>Part 2 — The Ledger That Runs in Parallel</span>
+      </a>
+      <a class="sb-link-item" href="https://simplitconsulting.com/what-is-a-ledger/">
+        <div class="sb-dot sb-dot-p3"></div><span>Part 3 — What Is a Ledger in Oracle Fusion?</span>
+      </a>
+      <a class="sb-link-item" href="https://simplitconsulting.com/gl-architecture-series/">
+        <div class="sb-dot" style="background:var(--ink4)"></div><span>Full Series Index &amp; All Resources</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="sb-widget">
+    <div class="sb-widget-header"><span>Interactive Tools</span></div>
+    <div class="sb-widget-body" style="padding:0 16px 16px">
+      <a class="sb-link-item" href="https://shameembauccha.github.io/Gl-Architecture/balancing-segments-explorer-complete.html" target="_blank" rel="noopener">
+        <div class="sb-dot sb-dot-blue"></div><span>Balancing Segments Explorer</span>
+      </a>
+      <a class="sb-link-item" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-use-cases.html" target="_blank" rel="noopener">
+        <div class="sb-dot sb-dot-blue"></div><span>13 Secondary Ledger Use Cases</span>
+      </a>
+      <a class="sb-link-item" href="https://shameembauccha.github.io/Gl-Architecture/ledger-decision-tree.html" target="_blank" rel="noopener">
+        <div class="sb-dot sb-dot-blue"></div><span>Ledger Design Decision Tree</span>
+      </a>
+      <a class="sb-link-item" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-config-guide.html" target="_blank" rel="noopener">
+        <div class="sb-dot sb-dot-blue"></div><span>Secondary Ledger Configuration Guide</span>
+      </a>
+      <a class="sb-link-item" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-recon-guide.html" target="_blank" rel="noopener">
+        <div class="sb-dot sb-dot-blue"></div><span>Reconciliation Report Guide</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="sb-widget">
+    <div class="sb-widget-header"><span>White Papers</span></div>
+    <div class="sb-widget-body" style="padding:0 16px 16px">
+      <a class="sb-link-item" href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Multiple-Balancing-Segments-White-Paper-v1.0.pdf" target="_blank" rel="noopener">
+        <div class="sb-dot sb-dot-gold"></div><span>Multiple Balancing Segments — White Paper</span>
+      </a>
+      <a class="sb-link-item" href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Secondary-Ledger-Set-Up-Final.pdf" target="_blank" rel="noopener">
+        <div class="sb-dot sb-dot-gold"></div><span>Secondary Ledger Setup Guide (PDF)</span>
+      </a>
+      <a class="sb-link-item" href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Ledger-Set-Up-Final.pdf" target="_blank" rel="noopener">
+        <div class="sb-dot sb-dot-gold"></div><span>Ledger Setup Guide (PDF)</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="sb-widget">
+    <div class="sb-widget-header"><span>Categories</span></div>
+    <div class="sb-widget-body">
+      <a class="category-pill" href="https://simplitconsulting.com/blog">Finance in Oracle</a>
+      <a class="category-pill" href="https://simplitconsulting.com/blog">General Ledger</a>
+      <a class="category-pill" href="https://simplitconsulting.com/blog">Oracle Fusion Cloud</a>
+      <a class="category-pill" href="https://simplitconsulting.com/blog">Chart of Accounts</a>
+      <a class="category-pill" href="https://simplitconsulting.com/blog">Implementation Design</a>
+    </div>
+  </div>
+
+</aside>
+</div>
+
+</body>
+</html>

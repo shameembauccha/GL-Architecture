@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ledger That Runs in Parallel — Oracle Fusion Secondary Ledgers | Simpl'IT Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:        #0F1923;
+    --ink-light:  #3D4F5C;
+    --ink-muted:  #7A8C96;
+    --oracle-red: #C0392B;
+    --oracle-deep:#8B1A13;
+    --accent:     #1A5276;
+    --accent-mid: #2E5FA3;
+    --accent-lt:  #D6E4F7;
+    --gold:       #B8860B;
+    --gold-lt:    #FDF6E3;
+    --bg:         #FAFAF8;
+    --surface:    #FFFFFF;
+    --rule:       #E0E6EA;
+    --tag-bg:     #EEF4FB;
+    --r12-bg:     #FFF5F5;
+    --r12-border: #E8A09A;
+    --fusion-bg:  #F0F7FF;
+    --fusion-border: #2E5FA3;
+    --warn-bg:    #FFFBEB;
+    --warn-border:#D4AC0D;
+    --green-bg:   #F0FAF4;
+    --green-border:#27AE60;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 18px;
+    line-height: 1.78;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV STRIP ─────────────────────────────────────────── */
+  .nav-strip {
+    background: var(--ink);
+    padding: 12px 48px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-strip .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .nav-strip .sep { color: #ffffff44; margin: 0 4px; }
+  .nav-strip .crumb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #ffffff88;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── HERO ──────────────────────────────────────────────── */
+  .hero {
+    background: var(--ink);
+    padding: 80px 48px 72px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 80% 50%, #1A3A5C44 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, #ffffff06 39px, #ffffff06 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, #ffffff06 39px, #ffffff06 40px);
+  }
+  .hero-inner {
+    max-width: 800px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+  }
+  .tag-oracle { background: var(--oracle-red); color: #fff; }
+  .tag-gl { background: #1A5276; color: #fff; }
+  .tag-fusion { background: #ffffff18; color: #ffffffbb; border: 1px solid #ffffff22; }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: #9EC5F0;
+  }
+  .hero-sub {
+    font-family: 'Source Serif 4', serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: #ffffffcc;
+    max-width: 640px;
+    line-height: 1.7;
+    margin-bottom: 36px;
+    font-style: italic;
+  }
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1A5276, #2E5FA3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .author-info { display: flex; flex-direction: column; }
+  .author-name {
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .author-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #ffffff66;
+    letter-spacing: 0.06em;
+  }
+  .hero-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #ffffff55;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── LAYOUT ────────────────────────────────────────────── */
+  .article-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 48px;
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 64px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .article-wrap { grid-template-columns: 1fr; padding: 0 24px; }
+    .sidebar { display: none; }
+    .nav-strip, .hero { padding-left: 24px; padding-right: 24px; }
+  }
+
+  /* ── ARTICLE BODY ──────────────────────────────────────── */
+  .article-body { padding: 64px 0 120px; }
+
+  .article-body h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    margin: 64px 0 20px;
+    letter-spacing: -0.01em;
+  }
+  .article-body h2:first-child { margin-top: 0; }
+
+  .article-body h3 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 40px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-lt);
+  }
+
+  .article-body h4 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 28px 0 10px;
+  }
+
+  .article-body p {
+    margin-bottom: 22px;
+    color: var(--ink);
+    font-size: 18px;
+  }
+
+  .article-body ul, .article-body ol {
+    margin: 0 0 22px 0;
+    padding-left: 28px;
+  }
+  .article-body li { margin-bottom: 8px; }
+
+  .article-body a { color: var(--accent-mid); text-decoration: underline; text-underline-offset: 3px; }
+
+  hr.section-rule {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 56px 0;
+  }
+
+  /* ── LEAD ──────────────────────────────────────────────── */
+  .lead {
+    font-size: 21px;
+    font-style: italic;
+    color: var(--ink-light);
+    line-height: 1.7;
+    border-left: 4px solid var(--oracle-red);
+    padding-left: 24px;
+    margin-bottom: 36px;
+  }
+
+  /* ── PULL QUOTE ────────────────────────────────────────── */
+  .pull-quote {
+    background: var(--ink);
+    border-radius: 4px;
+    padding: 36px 40px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .pull-quote::before {
+    content: '\201C';
+    font-family: 'Playfair Display', serif;
+    font-size: 120px;
+    color: #ffffff0d;
+    position: absolute;
+    top: -20px;
+    left: 24px;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: #fff;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .pull-quote cite {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #ffffff66;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── INDUSTRY QUOTE ────────────────────────────────────── */
+  .industry-quote {
+    border-left: 3px solid var(--rule);
+    padding: 16px 24px;
+    margin: 20px 0;
+    background: var(--surface);
+  }
+  .industry-quote p {
+    font-style: italic;
+    color: var(--ink-light);
+    margin: 0 0 8px;
+    font-size: 16px;
+  }
+  .industry-quote cite {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── CALLOUT BOXES ─────────────────────────────────────── */
+  .callout {
+    border-radius: 4px;
+    padding: 24px 28px;
+    margin: 32px 0;
+  }
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .callout p { margin: 0; font-size: 16px; }
+  .callout-r12 { background: var(--r12-bg); border: 1px solid var(--r12-border); }
+  .callout-r12 .callout-label { color: var(--oracle-red); }
+  .callout-fusion { background: var(--fusion-bg); border: 1px solid var(--fusion-border); }
+  .callout-fusion .callout-label { color: var(--accent); }
+  .callout-warn { background: var(--warn-bg); border: 1px solid var(--warn-border); }
+  .callout-warn .callout-label { color: var(--gold); }
+  .callout-note { background: var(--gold-lt); border-left: 4px solid var(--gold); border-radius: 0 4px 4px 0; }
+  .callout-note .callout-label { color: var(--gold); }
+
+  /* ── STAT STRIP ────────────────────────────────────────── */
+  .stat-strip {
+    background: var(--accent);
+    border-radius: 6px;
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin: 48px 0;
+  }
+  @media (max-width: 700px) { .stat-strip { grid-template-columns: repeat(2,1fr); } }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: #fff;
+    display: block;
+    line-height: 1.1;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #ffffffaa;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 6px;
+    display: block;
+    line-height: 1.5;
+  }
+
+  /* ── USE CASE GROUPS ───────────────────────────────────── */
+  .uc-group {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 28px 0;
+  }
+  .uc-group-header {
+    background: var(--ink);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .uc-group-header .group-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ffffff88;
+  }
+  .uc-group-header .group-title {
+    font-family: 'Source Serif 4', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .uc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0;
+  }
+  .uc-item {
+    padding: 16px 20px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .uc-item:last-child { border-right: none; }
+  .uc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .uc-name {
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .uc-note {
+    font-size: 12px;
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+
+  /* ── SUMMARY TABLE ─────────────────────────────────────── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 32px 0;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 900px;
+  }
+  thead tr { background: var(--ink); }
+  thead th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffffcc;
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--rule); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:nth-child(even) { background: #F7F9FB; }
+  tbody td {
+    padding: 11px 14px;
+    color: var(--ink);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tbody td:first-child { font-weight: 600; white-space: nowrap; }
+  tbody td.r12-cell { color: #922B21; font-size: 12px; }
+  tbody td.kpi-cell { color: var(--accent); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+  .imp-sig { color: #1A7A4A; font-weight: 600; font-size: 11px; }
+  .imp-mod { color: var(--gold); font-weight: 600; font-size: 11px; }
+
+  /* ── CONFIG STEPS ──────────────────────────────────────── */
+  .config-steps {
+    counter-reset: step;
+    margin: 28px 0;
+  }
+  .config-step {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+  .step-num {
+    counter-increment: step;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .step-content h4 { margin: 0 0 4px; font-size: 16px; }
+  .step-content p { margin: 0; font-size: 15px; color: var(--ink-light); }
+
+  /* ── PITFALL BOX ───────────────────────────────────────── */
+  .pitfall-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  @media (max-width: 700px) { .pitfall-grid { grid-template-columns: 1fr; } }
+  .pitfall-item {
+    border: 1px solid var(--r12-border);
+    border-radius: 4px;
+    background: var(--r12-bg);
+    padding: 16px 18px;
+  }
+  .pitfall-item h4 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--oracle-deep);
+    margin: 0 0 6px;
+  }
+  .pitfall-item p {
+    font-size: 13px;
+    color: var(--ink-light);
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  /* ── SCREENSHOT PLACEHOLDER ────────────────────────────── */
+  .screenshot-placeholder {
+    background: linear-gradient(135deg, #f0f4f8, #e8eef4);
+    border: 2px dashed #B0C4D4;
+    border-radius: 6px;
+    padding: 48px 32px;
+    text-align: center;
+    margin: 28px 0;
+  }
+  .screenshot-placeholder .ph-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: block;
+    opacity: 0.5;
+  }
+  .screenshot-placeholder p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin: 0;
+    letter-spacing: 0.06em;
+  }
+  .screenshot-placeholder strong {
+    display: block;
+    font-size: 14px;
+    color: var(--ink-light);
+    margin-bottom: 6px;
+    font-family: 'Source Serif 4', serif;
+  }
+
+  /* ── CLOSING SECTION ───────────────────────────────────── */
+  .closing-bar {
+    background: var(--ink);
+    border-radius: 6px;
+    padding: 48px 48px;
+    margin: 56px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .closing-bar::before {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1A5276 0%, transparent 70%);
+    opacity: 0.4;
+  }
+  .closing-bar h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: #fff;
+    margin: 0 0 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .closing-bar p {
+    color: #ffffffcc;
+    font-size: 17px;
+    line-height: 1.75;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+  }
+  .closing-bar p:last-of-type { margin-bottom: 28px; }
+  .closing-sig {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #ffffff55;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── CTA ───────────────────────────────────────────────── */
+  .cta-block {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 32px 36px;
+    margin: 40px 0;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    background: var(--surface);
+  }
+  @media (max-width: 700px) { .cta-block { flex-direction: column; } }
+  .cta-text h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  .cta-text p { font-size: 15px; color: var(--ink-light); margin: 0; }
+  .cta-btn {
+    flex-shrink: 0;
+    background: var(--oracle-red);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+  }
+  .cta-btn:hover { background: var(--oracle-deep); }
+
+  /* ── SIDEBAR ───────────────────────────────────────────── */
+  .sidebar { padding: 64px 0 120px; }
+  .sidebar-widget {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    background: var(--surface);
+  }
+  .widget-header {
+    background: var(--ink);
+    padding: 12px 18px;
+  }
+  .widget-header span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ffffff88;
+  }
+  .widget-body { padding: 18px; }
+  .widget-body p { font-size: 14px; color: var(--ink-light); margin: 0 0 12px; line-height: 1.6; }
+  .widget-body p:last-child { margin: 0; }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .toc-list li {
+    border-bottom: 1px solid var(--rule);
+    padding: 0;
+  }
+  .toc-list li:last-child { border-bottom: none; }
+  .toc-list a {
+    display: block;
+    padding: 10px 0;
+    font-size: 13px;
+    color: var(--ink-light);
+    text-decoration: none;
+    font-family: 'Source Serif 4', serif;
+    line-height: 1.4;
+  }
+  .toc-list a:hover { color: var(--accent); }
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-muted);
+    margin-right: 6px;
+  }
+
+  .related-post {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+  }
+  .related-post:last-child { border-bottom: none; padding-bottom: 0; }
+  .related-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--oracle-red);
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .related-post span {
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.4;
+    font-family: 'Source Serif 4', serif;
+  }
+  .related-post:hover span { color: var(--accent); }
+
+  .category-pill {
+    display: inline-block;
+    background: var(--tag-bg);
+    border: 1px solid #C8D8F0;
+    border-radius: 2px;
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 3px 3px 3px 0;
+    text-decoration: none;
+  }
+
+  /* ── INLINE CODE ───────────────────────────────────────── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: #EEF4FB;
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+
+  /* ── ERP COMPARISON TABLE ──────────────────────────────── */
+  .erp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 28px 0;
+  }
+  @media (max-width: 700px) { .erp-grid { grid-template-columns: 1fr; } }
+  .erp-card {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .erp-card-header {
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .erp-sap { background: #0A3D62; color: #fff; }
+  .erp-d365 { background: #003B5C; color: #fff; }
+  .erp-netsuite { background: #1A5276; color: #fff; }
+  .erp-workday { background: #2C3E50; color: #fff; }
+  .erp-infor { background: #1B4F72; color: #fff; }
+  .erp-epicor { background: #154360; color: #fff; }
+  .erp-card-body {
+    padding: 14px 16px;
+    background: var(--surface);
+  }
+  .erp-card-body p {
+    font-size: 13px;
+    color: var(--ink-light);
+    margin: 0 0 8px;
+    line-height: 1.55;
+  }
+  .erp-card-body p:last-child { margin: 0; }
+  .erp-gap-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--oracle-red);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-inner { animation: fadeUp 0.6s ease both; }
+  .article-body { animation: fadeUp 0.7s 0.1s ease both; }
+</style>
+</head>
+<body>
+
+<!-- NAV STRIP -->
+<nav class="nav-strip">
+  <a class="logo" href="https://simplitconsulting.com">Simpl'IT Consulting</a>
+  <span class="sep">›</span>
+  <a class="crumb" href="https://simplitconsulting.com/blog" style="text-decoration:none;color:inherit">Blog</a>
+  <span class="sep">›</span>
+  <a class="crumb" href="https://simplitconsulting.com/blog" style="text-decoration:none;color:inherit">Finance in Oracle</a>
+  <!-- TO BE DESIGNED: Get in Touch page -->
+  <a href="https://simplitconsulting.com/contact/" style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border:1px solid #581C0C;color:#C03010;border-radius:2px;text-decoration:none;">Get in Touch</a>
+</nav>
+
+<!-- SERIES NAV -->
+<div style="background:#1A160E;border-bottom:1px solid #2A2418;padding:10px 48px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;">
+  <span style="color:#4A4030">GL Architecture Series</span>
+  <span style="color:#3A3028">·</span>
+  <a href="https://simplitconsulting.com/why-one-balancing-segment-was-never-enough/" style="color:#5A7AAA;text-decoration:none;" onmouseover="this.style.color='#7A9ACC'" onmouseout="this.style.color='#5A7AAA'">Part 1 — Balancing Segments</a>
+  <span style="color:#3A3028">·</span>
+  <span style="color:#C8A040;font-weight:500">Part 2 — Secondary Ledgers (this article)</span>
+  <span style="color:#3A3028">·</span>
+  <a href="https://simplitconsulting.com/what-is-a-ledger/" style="color:#5A7AAA;text-decoration:none;" onmouseover="this.style.color='#7A9ACC'" onmouseout="this.style.color='#5A7AAA'">Part 3 — What Is a Ledger?</a>
+  <a href="https://simplitconsulting.com/gl-architecture-series/" style="margin-left:auto;color:#8A7060;text-decoration:none;border:1px solid #3A3028;padding:4px 12px;border-radius:2px;" onmouseover="this.style.color='#C8A040';this.style.borderColor='#5A4828'" onmouseout="this.style.color='#8A7060';this.style.borderColor='#3A3028'">View full series →</a>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="tag tag-oracle">Oracle Fusion Cloud ERP</span>
+      <span class="tag tag-gl">General Ledger</span>
+      <span class="tag tag-fusion">Finance Transformation</span>
+    </div>
+    <h1>The Ledger That Runs<br>in <em>Parallel</em></h1>
+    <p class="hero-sub">Oracle Fusion Secondary Ledgers and the accounting policy problem they actually solve — thirteen use cases, zero spreadsheets.</p>
+    <div class="hero-meta">
+      <div class="avatar-row">
+        <div class="avatar">SB</div>
+        <div class="author-info">
+          <a class="author-name" href="https://www.linkedin.com/in/shameemakhtar/" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:none;font-weight:600;font-size:15px;">Shameem Bauccha</a>
+          <span class="author-role">Oracle Fusion GL · Finance Transformation</span>
+        </div>
+      </div>
+      <span class="hero-date">February 2026 · 18 min read</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<div class="article-wrap">
+
+  <!-- ARTICLE BODY -->
+  <main class="article-body">
+
+    <p class="lead">Every organisation that operates across multiple accounting standards, tax jurisdictions, or regulatory regimes has the same problem: one set of transactions, multiple versions of the truth. For decades, the answer was spreadsheets, shadow books, and manual journals posted by someone who understood a system no one else could explain. Secondary ledgers are Oracle's architectural answer to that problem — but most implementations use a fraction of what they can actually do.</p>
+
+    <p>If you have read our earlier piece on <a href="https://simplitconsulting.com/why-one-balancing-segment-was-never-enough/">why one balancing segment was never enough</a>, you already understand the foundation: Oracle Fusion's ability to enforce balance across multiple dimensions of your chart of accounts is a structural shift, not a configuration option. Secondary ledgers sit one layer above that foundation. Where multiple balancing segments answer the question of <em>where</em> your books need to balance, secondary ledgers answer a different and equally important question: <em>under which accounting rules?</em></p>
+
+    <p>IFRS and local GAAP. Corporate standard cost and statutory actual cost. IFRS 16 right-of-use assets and operating lease expense. IAS 29 constant currency and historical cost. These are not reporting differences — they are genuine accounting differences that require different journal entries for the same underlying transaction. A secondary ledger produces those entries automatically, from the same source transaction, without manual intervention. At least, that is what it does when it is configured correctly.</p>
+
+    <hr class="section-rule" id="s1">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: THE PROBLEM                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2>1. The Problem — What R12 Left Unresolved</h2>
+
+    <p>Oracle EBS R12 introduced secondary ledgers as a concept. The architecture existed. But the execution was expensive, brittle, and in many cases more painful than the manual workarounds it was meant to replace.</p>
+
+    <p>Chart of accounts mapping between a corporate CoA and a local statutory CoA was a manual exercise — typically a spreadsheet that someone maintained alongside the system rather than within it. Subledger Accounting rule authoring was powerful in theory but complex enough in practice that most implementations either under-configured it, leaving the secondary ledger producing identical entries to the primary, or over-customised it, creating a rule set so fragile that every patch cycle required remediation work. Reconciliation between primary and secondary was an offline process. Close Monitor did not exist. The secondary ledger was technically available but practically underused — and when it was used, it consumed disproportionate implementation and maintenance effort relative to the value it delivered.</p>
+
+    <div class="callout callout-r12">
+      <span class="callout-label">⚠ The R12 Reality</span>
+      <p>In R12, the most common implementation decision was to not implement secondary ledgers at all — and to address statutory reporting requirements through manual journals, separate Oracle instances, or shadow systems maintained outside the GL. The cost of doing secondary ledgers properly in R12 typically exceeded the cost of the workaround.</p>
+    </div>
+
+    <h3 id="s1-erp">The Same Problem, Across Every ERP Landscape</h3>
+
+    <p>The dual-books challenge is not unique to Oracle customers. Organisations migrating to Fusion from SAP, Microsoft Dynamics 365, NetSuite, or other mid-market platforms face the same underlying requirement — and in many cases arrive at Fusion having lived with ERP-specific workarounds that are even more constrained than what R12 offered.</p>
+
+    <div class="erp-grid">
+      <div class="erp-card">
+        <div class="erp-card-header erp-sap">SAP S/4HANA / ECC</div>
+        <div class="erp-card-body">
+          <span class="erp-gap-label">Typical Gap</span>
+          <p>Parallel ledgers in SAP require a separate ledger group and ledger-specific posting areas. In practice, account determination for parallel ledgers is complex to maintain, and many clients rely on manual adjustment postings or reconciliation accounts rather than full parallel accounting. Extension ledgers in S/4HANA partially address this but require significant configuration discipline.</p>
+        </div>
+      </div>
+      <div class="erp-card">
+        <div class="erp-card-header erp-d365">Microsoft Dynamics 365</div>
+        <div class="erp-card-body">
+          <span class="erp-gap-label">Typical Gap</span>
+          <p>D365 Finance supports reporting currencies and some dual-currency scenarios natively, but true parallel accounting under different accounting standards requires custom development or third-party add-ons. Statutory reporting in markets with significant local GAAP divergence from IFRS is commonly handled through Power BI overlays and manual adjustments rather than system-generated parallel entries.</p>
+        </div>
+      </div>
+      <div class="erp-card">
+        <div class="erp-card-header erp-netsuite">Oracle NetSuite</div>
+        <div class="erp-card-body">
+          <span class="erp-gap-label">Typical Gap</span>
+          <p>NetSuite's multi-book accounting feature provides limited parallel accounting capability — primarily focused on currency and tax basis differences. Complex use cases such as IFRS 16 vs operating lease, component accounting under IAS 16, or IFRS 9 ECL provisioning require custom scripting (SuiteScript) or third-party solutions. The framework was not designed for large-scale statutory dual-book scenarios.</p>
+        </div>
+      </div>
+      <div class="erp-card">
+        <div class="erp-card-header erp-workday">Workday Financial Management</div>
+        <div class="erp-card-body">
+          <span class="erp-gap-label">Typical Gap</span>
+          <p>Workday supports multiple books at a conceptual level but its accounting framework is less decomposable than Oracle's Subledger Accounting engine. Organisations requiring transaction-level SLA rule differentiation per accounting standard typically find Workday's native capability insufficient and resort to journal-level adjustments or integration with external statutory reporting tools.</p>
+        </div>
+      </div>
+      <div class="erp-card">
+        <div class="erp-card-header erp-infor">Infor CloudSuite / LN</div>
+        <div class="erp-card-body">
+          <span class="erp-gap-label">Typical Gap</span>
+          <p>Infor's multi-financial company structure can approximate some parallel accounting scenarios but is typically implemented as separate legal entity books rather than true transaction-level parallel entries. Manufacturing clients on Infor LN with complex cost accounting requirements across statutory and management books often maintain parallel cost models in spreadsheets or BI tools.</p>
+        </div>
+      </div>
+      <div class="erp-card">
+        <div class="erp-card-header erp-epicor">Epicor / Other Mid-Market</div>
+        <div class="erp-card-body">
+          <span class="erp-gap-label">Typical Gap</span>
+          <p>Mid-market ERPs in this category generally have no native parallel accounting framework. Statutory reporting under a different standard from the operational CoA is almost universally handled through end-of-period manual journals, exported trial balances adjusted in spreadsheets, or dedicated statutory reporting tools (CCH Tagetik, LucaNet) that sit outside the ERP entirely.</p>
+        </div>
+      </div>
+    </div>
+
+    <p>For organisations migrating from any of these platforms, Oracle Fusion's secondary ledger architecture represents a genuine step forward — not as a marketing claim but as a measurable reduction in the manual effort and reconciliation risk that statutory dual-book reporting has historically required. The question is not whether Fusion can do it. The question is whether the implementation is designed to take advantage of it.</p>
+
+    <div class="callout callout-note">
+      <span class="callout-label">📋 Migration Note</span>
+      <p>Organisations migrating to Fusion from SAP, D365, or NetSuite should treat secondary ledger design as a first-class deliverable in the solution design phase — not a post-go-live enhancement. The window to configure CoA mapping sets, SLA methods, and conversion levels correctly is at initial implementation. Retrofitting after go-live is technically possible but operationally disruptive.</p>
+    </div>
+
+    <hr class="section-rule" id="s2">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: WHAT CHANGED IN FUSION                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2>2. What Actually Changed in Fusion</h2>
+
+    <p>Fusion did not invent secondary ledgers. It made them usable. That distinction matters, because it changes what organisations should expect from an implementation — and what failure looks like when the configuration is done without understanding the new capabilities.</p>
+
+    <h3>CoA Mapping Sets as a First-Class Object</h3>
+    <p>In R12, mapping between a corporate chart of accounts and a statutory chart of accounts was handled through a combination of manual configuration and, more often than not, spreadsheet-based segment mapping that existed outside the system. In Fusion, Chart of Accounts Mapping Sets are a dedicated setup object. You define segment-by-segment mapping rules with rollup support for many-to-one relationships and account rules for exceptions. The mapping is auditable, versionable, and maintained within the system. This alone closes the single largest practical gap that made secondary ledgers difficult in R12.</p>
+
+    <h3>The SLA Rule Framework — Declarative, Not Custom</h3>
+    <p>Oracle's Subledger Accounting engine existed in R12. The difference in Fusion is not the engine — it is the condition framework. In Fusion, SLA Journal Line Rules can be conditioned on a significantly wider range of transaction attributes: Business Unit, Legal Entity, Supplier Type, Customer Class, Expenditure Type, Project Type, Contract Type, Instrument Classification, Cost Book, and Descriptive Flexfield values, among others. This means that for the first time, you can write a rule that says: <em>when this transaction is a development expenditure on a project contract of type Fixed Price, account for it differently in the secondary ledger</em> — without writing custom code. The rule is declarative. It is maintained in the UI. It survives patching.</p>
+
+    <h3>Close Monitor and Parallel Period Management</h3>
+    <p>One of the most underappreciated operational improvements in Fusion is the Close Monitor. It provides a unified view of period-end status across both the primary and secondary ledger simultaneously. In R12, tracking where you were in the close cycle across multiple ledgers required custom reports or manual coordination. In Fusion, the Close Monitor surfaces both ledgers in one place, with threshold-based alerts for inter-ledger reconciliation variances. The administrative overhead of running a secondary ledger — which in R12 could consume significant finance team time every close cycle — is substantially reduced.</p>
+
+    <h3>The Conversion Level — The Decision That Determines Everything</h3>
+    <p>The most important configuration decision in any secondary ledger implementation is the conversion level. It determines at what point in the accounting flow the secondary ledger begins to diverge from the primary. Fusion supports four levels:</p>
+
+    <div class="callout callout-fusion">
+      <span class="callout-label">🔷 Conversion Levels — Choose Deliberately</span>
+      <p><strong>Subledger:</strong> Differences start at the subledger accounting stage. Required when accounting rules differ at the transaction level — the most common and most powerful configuration for statutory dual-book scenarios.<br><br>
+      <strong>Journal:</strong> Adjustments made at journal entry stage. Used when subledger entries are identical but GL-level adjustments differ.<br><br>
+      <strong>Balance:</strong> Only balances transferred. Simplest but least flexible — use only when the secondary ledger requires the same entries as the primary with minor balance-level adjustments.<br><br>
+      <strong>Adjustment Only:</strong> Manual journals only — no automatic transfer from primary. Used for pre-consolidation adjustment ledgers and staging scenarios.</p>
+    </div>
+
+    <p>Setting the wrong conversion level is the most common cause of a secondary ledger that produces no value — either because it duplicates the primary exactly, or because it requires more manual effort to maintain than the workaround it was meant to replace.</p>
+
+    <div class="stat-strip">
+      <div class="stat-item">
+        <span class="stat-num">13</span>
+        <span class="stat-label">Distinct use cases covered by Fusion secondary ledgers</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">~100%</span>
+        <span class="stat-label">Manual bridge journals eliminated in well-configured implementations</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">−40%</span>
+        <span class="stat-label">Avg. reduction in statutory close cycle time</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">100%</span>
+        <span class="stat-label">IAS 16 component accounting compliance achievable natively</span>
+      </div>
+    </div>
+
+    <hr class="section-rule" id="s3">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: THE 13 USE CASES                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2>3. The Thirteen Use Cases — Grouped by Problem Type</h2>
+
+    <p>Secondary ledgers are not a single-purpose tool. The same architecture that handles IFRS vs local GAAP statutory reporting also handles tax basis asset values, IFRS 9 ECL provisioning, JV gross-basis operator reporting, and IAS 29 hyperinflation restatement. What these use cases share is the same underlying requirement: one transaction, two accounting representations, both system-generated, both auditable.</p>
+
+    <p>We group them into three categories based on the type of problem they solve.</p>
+
+    <h3>Group 1 — Regulatory &amp; Standards Compliance</h3>
+    <p>These use cases are driven by the need to report under two different accounting standards simultaneously. The accounting difference is systematic and applies across large volumes of transactions. Without a secondary ledger, they are managed through manual journals that repeat every period with minimal variation and maximum risk.</p>
+
+    <div class="uc-group">
+      <div class="uc-group-header">
+        <span class="group-label">Group 1</span>
+        <span class="group-title">Regulatory &amp; Standards Compliance</span>
+      </div>
+      <div class="uc-grid">
+        <div class="uc-item">
+          <span class="uc-num">01</span>
+          <span class="uc-name">Statutory Reporting</span>
+          <span class="uc-note">IFRS primary, local GAAP secondary — CoA mapping, provisions, revenue timing</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">07</span>
+          <span class="uc-name">Lease Accounting</span>
+          <span class="uc-note">IFRS 16 ROU/liability in primary; operating lease expense in secondary</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">08</span>
+          <span class="uc-name">Tax / Deferred Tax</span>
+          <span class="uc-note">Tax-basis asset values; temporary differences; IAS 12 / ASC 740 inputs</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">09</span>
+          <span class="uc-name">Hyperinflationary Economies</span>
+          <span class="uc-note">IAS 29 restated primary; historical cost secondary — price index driven</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">11</span>
+          <span class="uc-name">Financial Instruments</span>
+          <span class="uc-note">IFRS 9 ECL and FVOCI in primary; incurred loss and cost basis in secondary</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">13</span>
+          <span class="uc-name">Grant Accounting</span>
+          <span class="uc-note">IAS 20 deferred income primary; immediate recognition secondary for public sector</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Group 2 — Operational Accounting Differences</h3>
+    <p>These use cases arise from operational accounting policies that differ between the corporate and statutory view of the same underlying activity. They are transactionally intensive — large volumes of entries across AP, AR, fixed assets, and cost accounting — which makes manual workarounds particularly costly in terms of both time and error rate.</p>
+
+    <div class="uc-group">
+      <div class="uc-group-header">
+        <span class="group-label">Group 2</span>
+        <span class="group-title">Operational Accounting Differences</span>
+      </div>
+      <div class="uc-grid">
+        <div class="uc-item">
+          <span class="uc-num">02</span>
+          <span class="uc-name">Fixed Assets (FA)</span>
+          <span class="uc-note">IAS 16 component accounting primary; pooled statutory depreciation secondary</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">03</span>
+          <span class="uc-name">Cost Accounting</span>
+          <span class="uc-note">Standard cost primary; actual/WAC secondary — independent costing policies per ledger</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">04</span>
+          <span class="uc-name">AP / AR</span>
+          <span class="uc-note">Prepayments, deferred revenue, withholding tax — enhanced SLA conditions</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">05</span>
+          <span class="uc-name">Projects</span>
+          <span class="uc-note">IFRS 15 performance obligation primary; PoC or completed contract secondary</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Group 3 — Structural &amp; Group Reporting</h3>
+    <p>These use cases arise from the structure of the organisation itself — joint ventures, intercompany relationships, and the mechanics of group consolidation. They are often the most underestimated in terms of effort, because the manual workarounds are embedded in processes that finance teams have run for years without questioning whether the system could do it better.</p>
+
+    <div class="uc-group">
+      <div class="uc-group-header">
+        <span class="group-label">Group 3</span>
+        <span class="group-title">Structural &amp; Group Reporting</span>
+      </div>
+      <div class="uc-grid">
+        <div class="uc-item">
+          <span class="uc-num">06</span>
+          <span class="uc-name">Intercompany</span>
+          <span class="uc-note">Eliminate IC in primary for consolidation; retain full IC balances in secondary for statutory</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">10</span>
+          <span class="uc-name">Joint Venture / PSA</span>
+          <span class="uc-note">Working interest share in primary; 100% gross in secondary for partner and regulator reporting</span>
+        </div>
+        <div class="uc-item">
+          <span class="uc-num">12</span>
+          <span class="uc-name">Pre-Consolidation Adjustments</span>
+          <span class="uc-note">Adjustment-only ledger stages goodwill amortisation, PPA step-ups before FCCS/HFM feed</span>
+        </div>
+      </div>
+    </div>
+
+    <p>For each of these use cases, the detail — functional configuration steps, SLA rule setup, accounting entry examples, and quantified KPIs — is documented in the full configuration guide linked at the end of this article. The table below summarises all thirteen across the key dimensions.</p>
+
+    <h3>Summary: R12 Workaround vs Fusion — All 13 Use Cases</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Use Case</th>
+            <th>Gap in R12</th>
+            <th>R12 Workaround</th>
+            <th>Fusion Feature</th>
+            <th>Improvement</th>
+            <th>Quantified KPIs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Statutory Reporting</td>
+            <td>Manual CoA mapping; offline reconciliation</td>
+            <td class="r12-cell">Excel segment mapping + manual GL reports + periodic manual journals</td>
+            <td>CoA Mapping Sets, Enhanced SLA, Close Monitor</td>
+            <td><span class="imp-sig">Significant</span></td>
+            <td class="kpi-cell">Close cycle −25–40%; Recon variance &lt;0.1%; Audit findings −80%</td>
+          </tr>
+          <tr>
+            <td>Fixed Assets (FA)</td>
+            <td>No IAS 16 component accounting; FA-SLA weak</td>
+            <td class="r12-cell">Separate Tax/Stat book + manual bridge journals to GL each period</td>
+            <td>Component Accounting, FA-SLA Integration, Asset Book-to-Secondary mapping</td>
+            <td><span class="imp-sig">Significant</span></td>
+            <td class="kpi-cell">Manual journals ~100% eliminated; IAS 16 compliance 100%; FA close −30%</td>
+          </tr>
+          <tr>
+            <td>Cost Accounting</td>
+            <td>Dual costing policy not supported</td>
+            <td class="r12-cell">Separate costing org or parallel manual cost run + Excel reconciliation</td>
+            <td>Cost Accounting SLA Framework, Mapping Sets, Independent Costing Policies</td>
+            <td><span class="imp-sig">Significant</span></td>
+            <td class="kpi-cell">Inventory recon time −60%; PPV accuracy +90%; Manual WIP adj −95%</td>
+          </tr>
+          <tr>
+            <td>AP / AR</td>
+            <td>Limited SLA conditions; prepayment/deferred brittle</td>
+            <td class="r12-cell">Manual journal adjustments; custom SLA extensions; patch-sensitive maintenance</td>
+            <td>Enhanced SLA Conditions, Prepayment &amp; Deferred Revenue, Audit Trail UI</td>
+            <td><span class="imp-mod">Moderate</span></td>
+            <td class="kpi-cell">Posting error rate &lt;0.5%; Deferred revenue accuracy &gt;99%; Rule maint −40%</td>
+          </tr>
+          <tr>
+            <td>Projects</td>
+            <td>No project-attribute SLA conditions</td>
+            <td class="r12-cell">Manual revenue adjustment journals; offline tracking spreadsheets per project</td>
+            <td>Project Attribute SLA Conditions, IFRS 15 PO Framework, Project-to-Contract Integration</td>
+            <td><span class="imp-mod">Moderate (validate)</span></td>
+            <td class="kpi-cell">Rev rec accuracy &gt;98%; Manual adj −70%; Unbilled recon time −40%</td>
+          </tr>
+          <tr>
+            <td>Intercompany</td>
+            <td>IC elimination hard to split per ledger</td>
+            <td class="r12-cell">Manual elimination journals in primary; separate IC tracking register</td>
+            <td>IC SLA Conditions, Intercompany Framework, Elimination Rule Sets</td>
+            <td><span class="imp-sig">Significant</span></td>
+            <td class="kpi-cell">IC recon exceptions −75%; Manual IC journals −90%; Audit findings −60%</td>
+          </tr>
+          <tr>
+            <td>Lease Accounting (IFRS 16)</td>
+            <td>No selective ROU/liability suppression</td>
+            <td class="r12-cell">Manual ROU reversal journals in secondary each period — high volume</td>
+            <td>Lease SLA Conditions, Event-Type Filtering, Operating Lease Override Rules</td>
+            <td><span class="imp-sig">Significant</span></td>
+            <td class="kpi-cell">Manual lease journals ~0; Reclass errors −100%; Lease close −50%</td>
+          </tr>
+          <tr>
+            <td>Tax / Deferred Tax</td>
+            <td>Tax basis mixed with accounting values</td>
+            <td class="r12-cell">Excel workpapers for temp differences; manual tax NBV lookups from FA tax book</td>
+            <td>Tax Book as Secondary Ledger, Tax-Basis ADRs, Temporary Difference Tracking</td>
+            <td><span class="imp-sig">Significant</span></td>
+            <td class="kpi-cell">Deferred tax calc time −40%; Provision accuracy +15%; Tax close −30%</td>
+          </tr>
+          <tr>
+            <td>Hyperinflationary Economies</td>
+            <td>Manual IAS 29 restatement; error-prone</td>
+            <td class="r12-cell">Excel price index restatement on trial balance; comparatives recalculated each year</td>
+            <td>Reporting Currency + Secondary Ledger, IAS 29 Rules, Price Index Integration</td>
+            <td><span class="imp-sig">Significant</span></td>
+            <td class="kpi-cell">Restatement errors −90%; Cycle time −60%; Manual journals −80%</td>
+          </tr>
+          <tr>
+            <td>Joint Venture / PSA</td>
+            <td>Gross vs net interest not automated</td>
+            <td class="r12-cell">Shadow ledger in spreadsheets for gross amounts; manual partner billing</td>
+            <td>JV Interest SLA Conditions, Project Type Filtering, Working Interest ADRs</td>
+            <td><span class="imp-mod">Moderate–High</span></td>
+            <td class="kpi-cell">Gross-up manual effort −85%; JV audit findings −50%; Operator reporting −40%</td>
+          </tr>
+          <tr>
+            <td>Financial Instruments (IFRS 9)</td>
+            <td>ECL and incurred loss mixed in single ledger</td>
+            <td class="r12-cell">ECL in external model; manually journalized; local provision in separate spreadsheet</td>
+            <td>Instrument Classification ADRs, ECL vs Incurred-Loss JLRs, FV Override Rules</td>
+            <td><span class="imp-sig">Significant</span></td>
+            <td class="kpi-cell">Provision recon time −55%; FV adjustment errors −70%; Regulatory accuracy +20%</td>
+          </tr>
+          <tr>
+            <td>Pre-Consolidation Adjustments</td>
+            <td>Consolidation adj mixed in primary</td>
+            <td class="r12-cell">Excel workbook manually keyed into HFM/Hyperion; version control issues</td>
+            <td>Adjustment-Only Secondary Ledger, EPM Integration, Goodwill Amortisation JLRs</td>
+            <td><span class="imp-mod">Moderate</span></td>
+            <td class="kpi-cell">Consolidation prep time −30%; EPM data quality +20%; Manual adj −60%</td>
+          </tr>
+          <tr>
+            <td>Grant Accounting</td>
+            <td>IAS 20 vs immediate recognition conflict</td>
+            <td class="r12-cell">Manual journals to switch recognition; separate grant register in Excel</td>
+            <td>Grant Event SLA Conditions, Deferred Income JLRs, Public Sector Account ADRs</td>
+            <td><span class="imp-mod">Moderate</span></td>
+            <td class="kpi-cell">Grant compliance 100%; Audit adj on grants −70%; Manual journals −80%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-rule" id="s4">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: HOW IT WORKS                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2>4. How It Works — The Base Configuration Sequence</h2>
+
+    <p>Before any of the thirteen use cases can be configured, the secondary ledger infrastructure must be in place. The screenshots below — drawn from the Manage Accounting Configurations flow in Oracle Fusion Setup and Maintenance — show the actual setup screens at each stage. This is what implementation looks like before the SLA rules and CoA mapping are added.</p>
+
+    <div class="screenshot-placeholder">
+      <span class="ph-icon">📸</span>
+      <strong>Screenshot: Manage Accounting Configurations — Secondary Ledger Creation</strong>
+      <p>[SCREENSHOT PLACEHOLDER — Ledger Category = Secondary, Conversion Level selector, Legal Entity assignment]</p>
+    </div>
+
+    <p>The configuration sequence follows a strict order. Deviating from it — most commonly by attempting ledger setup before the CoA mapping is complete, or by assigning a SLAM before period options are defined — is the primary cause of rework in implementations.</p>
+
+    <div class="config-steps">
+      <div class="config-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Create the Secondary Ledger</h4>
+          <p><code>Setup and Maintenance › Manage Accounting Configurations › Ledgers</code> — Set Ledger Category = Secondary, assign to the same Legal Entity as the primary. At this stage, also define the secondary ledger's own Chart of Accounts (if different from the primary), Calendar, and Functional Currency.</p>
+        </div>
+      </div>
+      <div class="config-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Set the Conversion Level</h4>
+          <p><code>Ledger Options › Secondary Ledger Mapping</code> — Choose deliberately between Subledger, Journal, Balance, or Adjustment Only. This is the most consequential single decision in secondary ledger setup. For most statutory and operational use cases, Subledger is required.</p>
+        </div>
+      </div>
+      <div class="config-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Build and Assign the CoA Mapping Set</h4>
+          <p><code>Setup and Maintenance › Manage Chart of Accounts Mappings</code> — Define segment-level mapping rules between the primary and secondary CoA. Test with a draft Create Accounting run before finalising. Incomplete mapping is the most common cause of secondary ledger posting failures at go-live.</p>
+        </div>
+      </div>
+      <div class="config-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Create and Assign the Secondary SLAM</h4>
+          <p><code>Manage Subledger Accounting Methods</code> — Create a dedicated Subledger Accounting Method for the secondary ledger. This SLAM will reference the JLRs and ADRs that define how the secondary ledger accounts differently from the primary. Never leave the secondary ledger with the default SLAM — it will simply replicate primary entries.</p>
+        </div>
+      </div>
+      <div class="config-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Configure Journal Line Rules and Account Derivation Rules</h4>
+          <p><code>Manage Subledger Accounting › Journal Line Rules / Account Rules</code> — For each accounting difference between primary and secondary, create a JLR with the appropriate conditions and link it to an ADR that derives the correct secondary ledger account. Use Priority to ensure secondary-specific rules fire before default rules when Ledger = Secondary.</p>
+        </div>
+      </div>
+      <div class="config-step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Open Periods and Activate Close Monitor</h4>
+          <p><code>Accounting › Period Close › Close Monitor</code> — Open the secondary ledger period before any transaction processing or Create Accounting runs. Activate Close Monitor for both ledgers. Set variance thresholds for inter-ledger reconciliation alerts appropriate to each use case.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="screenshot-placeholder">
+      <span class="ph-icon">📸</span>
+      <strong>Screenshot: Manage Chart of Accounts Mappings — Segment Mapping Rules</strong>
+      <p>[SCREENSHOT PLACEHOLDER — Mapping set with segment rules, rollup configuration, account rule exceptions]</p>
+    </div>
+
+    <div class="screenshot-placeholder">
+      <span class="ph-icon">📸</span>
+      <strong>Screenshot: Manage Journal Line Rules — SLA Conditions on Secondary Ledger</strong>
+      <p>[SCREENSHOT PLACEHOLDER — JLR with Ledger condition set to Secondary, ADR assignment, priority configuration]</p>
+    </div>
+
+    <div class="screenshot-placeholder">
+      <span class="ph-icon">📸</span>
+      <strong>Screenshot: Close Monitor — Primary and Secondary Ledger Status</strong>
+      <p>[SCREENSHOT PLACEHOLDER — Close Monitor showing both ledgers, period status, reconciliation variance alert]</p>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-label">⚠ Critical Dependency</span>
+      <p>The secondary ledger period must be opened before running Create Accounting. This is the single most common operational error in the first period after go-live. If Create Accounting runs before the secondary period is open, entries are created for the primary but not the secondary — and the recovery process is manual and time-consuming. Automate period open as a system dependency in your period-end checklist.</p>
+    </div>
+
+    <hr class="section-rule" id="s5">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: WHAT TO EXPECT                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2>5. What to Expect — KPI Benchmarks by Use Case Group</h2>
+
+    <p>The KPI ranges below are indicative benchmarks based on typical implementation outcomes across the use cases described above. They are relative improvements against the pre-Fusion manual workaround baseline — not absolute targets. Actual results vary by organisation size, volume, data quality, and the maturity of the processes being replaced.</p>
+
+    <div class="callout callout-fusion">
+      <span class="callout-label">📊 Group 1 — Regulatory &amp; Standards Compliance</span>
+      <p>
+        <strong>Statutory close cycle time:</strong> −25 to −40% · 
+        <strong>Ledger reconciliation variance unexplained:</strong> target &lt;0.1% · 
+        <strong>Audit findings on statutory adjustments:</strong> −70 to −80% · 
+        <strong>IAS 29 restatement errors:</strong> −90% · 
+        <strong>ECL provision reconciliation time:</strong> −55% · 
+        <strong>Grant compliance rate:</strong> 100%
+      </p>
+    </div>
+
+    <div class="callout callout-fusion">
+      <span class="callout-label">📊 Group 2 — Operational Accounting Differences</span>
+      <p>
+        <strong>Manual bridge journal entries (FA):</strong> ~100% eliminated · 
+        <strong>Inventory reconciliation time:</strong> −60% · 
+        <strong>WIP manual adjustment journals:</strong> −95% · 
+        <strong>AP/AR posting error rate:</strong> &lt;0.5% · 
+        <strong>Project revenue recognition accuracy:</strong> &gt;98% · 
+        <strong>Lease close cycle time:</strong> −50%
+      </p>
+    </div>
+
+    <div class="callout callout-fusion">
+      <span class="callout-label">📊 Group 3 — Structural &amp; Group Reporting</span>
+      <p>
+        <strong>Manual IC elimination journals:</strong> −90% · 
+        <strong>Consolidation preparation time:</strong> −30 to −35% · 
+        <strong>JV gross-up manual effort:</strong> −85% · 
+        <strong>EPM data quality improvement:</strong> +20% · 
+        <strong>IC reconciliation exceptions:</strong> −75% · 
+        <strong>PSA government reporting compliance rate:</strong> 100%
+      </p>
+    </div>
+
+    <p>The organisations that consistently achieve the upper end of these ranges share one characteristic: they design the secondary ledger configuration as a first-class deliverable in the implementation programme, with its own workstream, its own test scripts, and its own UAT cycle. The organisations that fall short typically treat secondary ledgers as a post-go-live enhancement and configure them under time pressure, with incomplete SLA rule coverage and untested CoA mapping.</p>
+
+    <hr class="section-rule" id="s6">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: HARD TRUTHS                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2>6. The Hard Truths — What Goes Wrong and Why</h2>
+
+    <p>Secondary ledger implementations fail in predictable ways. The pitfalls below appear across implementations regardless of system integrator, industry, or organisation size. They are not configuration errors — they are design and governance errors that manifest as configuration problems.</p>
+
+    <div class="pitfall-grid">
+      <div class="pitfall-item">
+        <h4>Wrong Conversion Level</h4>
+        <p>Setting Balance or Journal when Subledger is required means the secondary ledger produces no transaction-level accounting differences. Discovered at UAT, corrected under time pressure, and rarely tested properly before go-live. Always confirm the conversion level with the finance team before any SLA configuration begins.</p>
+      </div>
+      <div class="pitfall-item">
+        <h4>No SLAM Assigned</h4>
+        <p>A secondary ledger with no dedicated Subledger Accounting Method defaults to Standard Accrual and produces entries identical to the primary. This is the most common cause of a secondary ledger that appears to work but adds no value. Every secondary ledger must have an explicitly assigned SLAM — even if it only overrides a handful of rules.</p>
+      </div>
+      <div class="pitfall-item">
+        <h4>Incomplete CoA Mapping</h4>
+        <p>Unmapped account combinations post to suspense or fail Create Accounting entirely. Run Create Accounting in Draft mode for a full period before go-live and resolve every exception. A mapping completeness rate of 100% against active account combinations is a go-live entry criterion, not a post-go-live target.</p>
+      </div>
+      <div class="pitfall-item">
+        <h4>Secondary Period Not Opened</h4>
+        <p>The single most common operational error in period 1. If Create Accounting runs before the secondary period is open, the recovery is manual. Automate period open for the secondary ledger as a system dependency — not a checklist item — in the period-end close process.</p>
+      </div>
+      <div class="pitfall-item">
+        <h4>Projects Unbilled Receivables Gap</h4>
+        <p>When IFRS 15 performance obligations and local GAAP recognition differ significantly, unbilled receivables and deferred revenue flow from Projects to GL can have gaps that are not visible until period end. Build a reconciliation report and schedule manual review for the first three periods after go-live — do not assume automation handles this completely.</p>
+      </div>
+      <div class="pitfall-item">
+        <h4>IAS 29 Restatement Scope</h4>
+        <p>For hyperinflationary entity implementations, the IAS 29 restatement run must be explicitly scoped to the primary ledger only. Teams that inadvertently run restatement against both ledgers corrupt the historical cost secondary — a recovery that requires period reversal and reprocessing across multiple modules.</p>
+      </div>
+    </div>
+
+    <p>There is a common thread across all of these: they are decisions made (or not made) at design time, not at configuration time. The implementation team that is asked to configure a secondary ledger without a signed-off design — conversion level, CoA mapping scope, SLAM structure, SLA rule coverage — will make these decisions under time pressure and get some of them wrong. Secondary ledger design must precede secondary ledger configuration.</p>
+
+    <hr class="section-rule">
+
+    <!-- CLOSING -->
+    <div class="closing-bar">
+      <h2>Closing Perspective</h2>
+      <p>Secondary ledgers are not a niche capability for complex multinationals with unusual reporting requirements. They are the architectural answer to a problem that exists in every organisation that operates under more than one set of accounting rules — which, in 2026, is most of them. IFRS 16 alone has created a dual-book requirement for every organisation with a material lease portfolio. IFRS 9 has done the same for financial services. Local GAAP divergence from IFRS continues to widen as regulators in major markets — Argentina, Turkey, India, Brazil, across Southeast Asia — maintain or strengthen their own statutory requirements.</p>
+      <p>The question is not whether your organisation needs a secondary ledger. The question is whether you are running one properly — or running a workaround that has the word "secondary ledger" attached to it but is actually a different SLAM assignment on the same CoA, producing entries that look different but are not auditably, systematically, and reliably different in the ways your statutory and regulatory obligations require them to be.</p>
+      <p>Oracle Fusion gives you the infrastructure to do this correctly. The CoA Mapping Sets, the enhanced SLA condition framework, the Close Monitor, the project and instrument attribute conditions — these are real capabilities that resolve real problems. But they require real design. The organisations that get this right do so because someone made the decision, early in the implementation, to treat secondary ledger configuration as a finance design problem that required finance expertise — not a technical configuration task to be completed after the primary ledger was done.</p>
+      <p>That decision is made at design time. It cannot easily be unmade after go-live.</p>
+      <span class="closing-sig">SB — <a href="https://www.linkedin.com/in/shameemakhtar/" target="_blank" rel="noopener" style="color:inherit">Shameem Bauccha</a> · Oracle Fusion GL · Finance Transformation · February 2026</span>
+    </div>
+
+    <!-- CTAs -->
+    <div class="cta-block">
+      <div class="cta-text">
+        <h4>13 Secondary Ledger Use Cases — Interactive Explorer</h4>
+        <p>Every scenario where parallel accounting is needed. Each use case includes scenario, SLA rule setup, accounting entry examples, and quantified KPIs — from IFRS vs local GAAP through IFRS 9, IAS 16, IAS 29, JV gross reporting, and pre-consolidation staging.</p>
+      </div>
+      <a href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-use-cases.html" class="cta-btn" target="_blank" rel="noopener">Open Explorer</a>
+    </div>
+
+    <div class="cta-block">
+      <div class="cta-text">
+        <h4>Secondary Ledger Configuration Guide</h4>
+        <p>Interactive step-by-step — Phase 1 base setup (8 steps) and Phase 2 SLA rule authoring for all six subledgers: GL, AP, AR, Fixed Assets, Cost Accounting, Projects.</p>
+      </div>
+      <a href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-config-guide.html" class="cta-btn" target="_blank" rel="noopener">Open Guide</a>
+    </div>
+
+    <div class="cta-block">
+      <div class="cta-text">
+        <h4>Reconciliation Report Guide</h4>
+        <p>Period-close reference — five variance types, investigation workflow, threshold recommendations by use case, and an interactive close checklist.</p>
+      </div>
+      <a href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-recon-guide.html" class="cta-btn" target="_blank" rel="noopener">Open Guide</a>
+    </div>
+
+    <div class="cta-block">
+      <div class="cta-text">
+        <h4>Ledger Design Decision Tree</h4>
+        <p>Answer four questions and get a specific ledger architecture recommendation — primary vs shared, secondary vs reporting currency, conversion level.</p>
+      </div>
+      <a href="https://shameembauccha.github.io/Gl-Architecture/ledger-decision-tree.html" class="cta-btn" target="_blank" rel="noopener">Open Tool</a>
+    </div>
+
+    <div class="cta-block">
+      <div class="cta-text">
+        <h4>White Paper — Secondary Ledger Setup</h4>
+        <p>Full technical reference: all 13 use cases, SLA rule setup, accounting entries, and KPIs in a single downloadable PDF.</p>
+      </div>
+      <a href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Secondary-Ledger-Set-Up-Final.pdf" class="cta-btn" target="_blank" rel="noopener">Download PDF</a>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-widget">
+      <div class="widget-header"><span>In This Article</span></div>
+      <div class="widget-body" style="padding: 0 18px;">
+        <ul class="toc-list">
+          <li><a href="#s1"><span class="toc-num">01</span>The Problem — What R12 Left Unresolved</a></li>
+          <li><a href="#s1-erp"><span class="toc-num">01a</span>The Same Problem, Across Every ERP</a></li>
+          <li><a href="#s2"><span class="toc-num">02</span>What Actually Changed in Fusion</a></li>
+          <li><a href="#s3"><span class="toc-num">03</span>The Thirteen Use Cases</a></li>
+          <li><a href="#s4"><span class="toc-num">04</span>How It Works — Base Configuration</a></li>
+          <li><a href="#s5"><span class="toc-num">05</span>What to Expect — KPI Benchmarks</a></li>
+          <li><a href="#s6"><span class="toc-num">06</span>The Hard Truths</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sidebar-widget">
+      <div class="widget-header"><span>Categories</span></div>
+      <div class="widget-body">
+        <a class="category-pill" href="https://simplitconsulting.com/blog">Finance in Oracle</a>
+        <a class="category-pill" href="https://simplitconsulting.com/blog">General Ledger</a>
+        <a class="category-pill" href="https://simplitconsulting.com/blog">IFRS</a>
+        <a class="category-pill" href="https://simplitconsulting.com/blog">Oracle Fusion Cloud</a>
+        <a class="category-pill" href="https://simplitconsulting.com/blog">Statutory Reporting</a>
+        <a class="category-pill" href="https://simplitconsulting.com/blog">Subledger Accounting</a>
+      </div>
+    </div>
+
+    <div class="sidebar-widget">
+      <div class="widget-header"><span>GL Architecture Series</span></div>
+      <div class="widget-body" style="padding: 0 18px 18px;">
+        <a class="related-post" href="https://simplitconsulting.com/why-one-balancing-segment-was-never-enough/">
+          <div class="related-dot"></div>
+          <span>Part 1 — Why One Balancing Segment Was Never Enough</span>
+        </a>
+        <a class="related-post" href="https://simplitconsulting.com/the-ledger-that-runs-in-parallel/">
+          <div class="related-dot"></div>
+          <span>Part 2 — The Ledger That Runs in Parallel (this article)</span>
+        </a>
+        <a class="related-post" href="https://simplitconsulting.com/what-is-a-ledger/">
+          <div class="related-dot"></div>
+          <span>Part 3 — What Is a Ledger in Oracle Fusion?</span>
+        </a>
+        <a class="related-post" href="https://simplitconsulting.com/gl-architecture-series/">
+          <div class="related-dot"></div>
+          <span>Full Series Index &amp; All Resources</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-widget">
+      <div class="widget-header"><span>Related Reading</span></div>
+      <div class="widget-body" style="padding: 0 18px 18px;">
+        <a class="related-post" href="https://simplitconsulting.com/why-one-balancing-segment-was-never-enough/">
+          <div class="related-dot"></div>
+          <span>Why One Balancing Segment Was Never Enough</span>
+        </a>
+        <a class="related-post" href="https://simplitconsulting.com/what-is-a-ledger/">
+          <div class="related-dot"></div>
+          <span>What Is a Ledger in Oracle Fusion?</span>
+        </a>
+        <a class="related-post" href="https://simplitconsulting.com/gl-architecture-series/">
+          <div class="related-dot"></div>
+          <span>GL Architecture Series — Full Index</span>
+        </a>
+        <a class="related-post" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-use-cases.html" target="_blank" rel="noopener">
+          <div class="related-dot"></div>
+          <span>13 Secondary Ledger Use Cases — Explorer</span>
+        </a>
+        <a class="related-post" href="https://shameembauccha.github.io/Gl-Architecture/ledger-decision-tree.html" target="_blank" rel="noopener">
+          <div class="related-dot"></div>
+          <span>Ledger Design Decision Tree — Interactive Tool</span>
+        </a>
+        <a class="related-post" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-config-guide.html" target="_blank" rel="noopener">
+          <div class="related-dot"></div>
+          <span>Secondary Ledger Configuration Guide — Interactive</span>
+        </a>
+        <a class="related-post" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-recon-guide.html" target="_blank" rel="noopener">
+          <div class="related-dot"></div>
+          <span>Reconciliation Report Guide — Period Close</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-widget">
+      <div class="widget-header"><span>Key Statistics</span></div>
+      <div class="widget-body">
+        <p><strong>13</strong> use cases covered in the full guide</p>
+        <p><strong>~100%</strong> of manual bridge journals eliminated in well-configured implementations</p>
+        <p><strong>−25 to −40%</strong> typical reduction in statutory close cycle time</p>
+        <p><strong>6 ERPs</strong> compared in the non-Oracle landscape section</p>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- end article-wrap -->
+
+</body>
+</html>

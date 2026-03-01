@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle Fusion GL Architecture Series | Simpl'IT Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0E0C09;
+  --surface:#161310;
+  --surface2:#1E1A15;
+  --surface3:#252018;
+  --border:#2A2520;
+  --border2:#3A3428;
+  --ink:#F0EBE2;
+  --ink2:#C0B8AC;
+  --ink3:#7A7268;
+  --ink4:#4A4438;
+  --oracle:#C03010;
+  --oracle-lt:#E04020;
+  --oracle-pale:#2A1008;
+  --blue:#2060A8;
+  --blue-lt:#3A80C8;
+  --blue-pale:#0A1828;
+  --gold:#C8960A;
+  --gold-lt:#E8B820;
+  --gold-pale:#1A1400;
+  --green:#1A7040;
+  --green-lt:#28A060;
+  --green-pale:#0A180E;
+  --p1:#2060A8;
+  --p2:#C03010;
+  --p3:#C8960A;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Barlow',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── NAV ── */
+.nav{
+  padding:16px 56px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;
+  background:var(--bg);
+}
+.nav-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-weight:700;
+  color:var(--ink);text-decoration:none;
+}
+.nav-sep{color:var(--border2);margin:0 6px}
+.nav-crumb{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink3);
+}
+
+/* ── HERO ── */
+.hero{
+  padding:96px 56px 80px;
+  position:relative;overflow:hidden;
+  border-bottom:1px solid var(--border);
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 80% 50%,#20406020 0%,transparent 65%),
+    radial-gradient(ellipse 40% 80% at 5% 80%,#C0301008 0%,transparent 60%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    90deg,transparent,transparent 79px,
+    rgba(255,255,255,.015) 79px,rgba(255,255,255,.015) 80px
+  );
+  pointer-events:none;
+}
+.hero-inner{max-width:900px;position:relative;z-index:1}
+.hero-kicker{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--oracle);margin-bottom:20px;
+  display:flex;align-items:center;gap:14px;
+}
+.hero-kicker::before{content:'';display:inline-block;width:32px;height:1px;background:var(--oracle)}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(38px,6vw,68px);
+  font-weight:700;color:var(--ink);
+  line-height:1.08;letter-spacing:-.02em;
+  margin-bottom:24px;
+}
+.hero h1 span{color:var(--gold-lt)}
+.hero-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:20px;
+  color:var(--ink3);line-height:1.7;
+  max-width:680px;margin-bottom:48px;
+}
+.hero-stats{
+  display:flex;gap:40px;flex-wrap:wrap;
+  padding-top:32px;border-top:1px solid var(--border);
+}
+.h-stat{}
+.h-stat-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:36px;font-weight:700;
+  color:var(--gold-lt);display:block;line-height:1;
+  margin-bottom:4px;
+}
+.h-stat-lbl{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink4);
+}
+
+/* ── MAIN GRID ── */
+.main{max-width:1200px;margin:0 auto;padding:64px 56px 100px}
+
+/* ── SECTION LABEL ── */
+.section-label{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:28px;
+  display:flex;align-items:center;gap:14px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── BLOG CARDS ── */
+.blog-cards{display:flex;flex-direction:column;gap:1px;margin-bottom:72px;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.blog-card{
+  background:var(--surface);
+  display:grid;
+  grid-template-columns:64px 1fr auto;
+  gap:0;
+  transition:background .2s;
+  text-decoration:none;
+  border-bottom:1px solid var(--border);
+}
+.blog-card:last-child{border-bottom:none}
+.blog-card:hover{background:var(--surface2)}
+.bc-num-cell{
+  display:flex;align-items:center;justify-content:center;
+  border-right:1px solid var(--border);
+  padding:28px 0;
+}
+.bc-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:700;
+  line-height:1;
+}
+.p1-num{color:var(--p1)}
+.p2-num{color:var(--p2)}
+.p3-num{color:var(--p3)}
+.bc-body{padding:24px 28px}
+.bc-series-tag{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:8px;display:block;
+}
+.bc-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:700;
+  color:var(--ink);line-height:1.25;
+  margin-bottom:8px;
+}
+.bc-desc{font-size:14px;color:var(--ink3);line-height:1.6;max-width:580px;margin-bottom:12px}
+.bc-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bc-tag{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 9px;border-radius:2px;border:1px solid;
+}
+.tag-live{border-color:var(--green);color:var(--green-lt);background:var(--green-pale)}
+.tag-new{border-color:var(--gold);color:var(--gold-lt);background:var(--gold-pale)}
+.tag-read{border-color:var(--blue);color:var(--blue-lt)}
+.bc-arrow{
+  display:flex;align-items:center;padding:0 24px;
+  font-size:20px;color:var(--ink4);
+  transition:color .2s,transform .2s;
+}
+.blog-card:hover .bc-arrow{color:var(--ink2);transform:translateX(4px)}
+
+/* Part colour accents */
+.p1-card{border-left:3px solid var(--p1)}
+.p2-card{border-left:3px solid var(--p2)}
+.p3-card{border-left:3px solid var(--p3)}
+
+/* ── TOOLS GRID ── */
+.tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:72px}
+@media(max-width:700px){.tools-grid{grid-template-columns:1fr}}
+.tool-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:4px;overflow:hidden;
+  text-decoration:none;transition:all .2s;
+  display:flex;flex-direction:column;
+}
+.tool-card:hover{border-color:var(--border2);background:var(--surface2)}
+.tc-header{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.tc-icon{
+  font-size:18px;flex-shrink:0;
+  width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:4px;
+}
+.tc-icon-blue{background:var(--blue-pale)}
+.tc-icon-gold{background:var(--gold-pale)}
+.tc-icon-oracle{background:var(--oracle-pale)}
+.tc-icon-green{background:var(--green-pale)}
+.tc-icon-purple{background:#100818}
+.tc-header-text{flex:1}
+.tc-type{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:3px;display:block;
+}
+.tc-title{
+  font-family:'Barlow',sans-serif;
+  font-size:14px;font-weight:700;color:var(--ink2);
+}
+.tc-body{padding:14px 20px;flex:1}
+.tc-desc{font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:10px}
+.tc-footer{
+  padding:10px 20px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.tc-host{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink4);
+}
+.tc-link-label{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--blue-lt);
+  display:flex;align-items:center;gap:4px;
+}
+.tool-card:hover .tc-link-label{color:var(--gold-lt)}
+
+/* ── WHITE PAPERS ── */
+.papers-list{display:flex;flex-direction:column;gap:12px;margin-bottom:72px}
+.paper-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:4px;
+  display:flex;align-items:center;gap:0;
+  text-decoration:none;overflow:hidden;
+  transition:all .2s;
+}
+.paper-item:hover{border-color:var(--border2);background:var(--surface2)}
+.pi-icon{
+  width:56px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  border-right:1px solid var(--border);
+  font-size:20px;
+}
+.pi-body{padding:14px 20px;flex:1}
+.pi-title{
+  font-family:'Barlow',sans-serif;
+  font-size:14px;font-weight:600;
+  color:var(--ink2);margin-bottom:3px;
+}
+.pi-desc{font-size:12px;color:var(--ink3);line-height:1.5}
+.pi-meta{
+  padding:14px 20px;
+  display:flex;flex-direction:column;
+  align-items:flex-end;gap:6px;
+  flex-shrink:0;
+}
+.pi-tag{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 9px;border-radius:2px;
+}
+.pi-tag-live{background:var(--green-pale);color:var(--green-lt);border:1px solid var(--green)}
+.pi-tag-soon{background:var(--surface2);color:var(--ink4);border:1px solid var(--border2)}
+.pi-size{font-family:'DM Mono',monospace;font-size:9px;color:var(--ink4)}
+
+/* ── ABOUT SECTION ── */
+.about-band{
+  background:var(--surface);
+  border:1px solid var(--border);border-radius:6px;
+  padding:40px 44px;
+  display:grid;grid-template-columns:1fr 280px;gap:40px;
+  margin-bottom:48px;
+}
+@media(max-width:700px){.about-band{grid-template-columns:1fr}}
+.about-author{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.about-avatar{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--blue-lt));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.about-name{font-family:'Barlow',sans-serif;font-size:15px;font-weight:700;color:var(--ink)}
+.about-role{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-top:2px}
+.about-text{font-size:14px;color:var(--ink3);line-height:1.7}
+.about-cta{display:flex;flex-direction:column;justify-content:center;gap:12px}
+.about-cta-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-weight:700;color:var(--ink2);
+  margin-bottom:4px;
+}
+.about-cta-desc{font-size:13px;color:var(--ink4);margin-bottom:8px;line-height:1.55}
+.btn-cta{
+  background:var(--oracle);color:#fff;
+  padding:11px 22px;border-radius:2px;
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  text-decoration:none;display:inline-block;
+  transition:background .2s;text-align:center;
+}
+.btn-cta:hover{background:var(--oracle-lt)}
+.btn-outline{
+  background:transparent;color:var(--ink3);
+  border:1px solid var(--border2);
+  padding:10px 22px;border-radius:2px;
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  text-decoration:none;display:inline-block;
+  transition:all .2s;text-align:center;
+}
+.btn-outline:hover{border-color:var(--ink3);color:var(--ink)}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.hero-inner{animation:fadeUp .6s ease both}
+.main{animation:fadeUp .65s .1s ease both}
+
+@media(max-width:800px){
+  .hero,.nav,.main{padding-left:24px;padding-right:24px}
+  .blog-card{grid-template-columns:48px 1fr 40px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="https://simplitconsulting.com">Simpl'IT Consulting</a>
+  <span class="nav-sep">›</span>
+  <a class="nav-crumb" href="https://simplitconsulting.com/blog" style="text-decoration:none">Blog</a>
+  <span class="nav-sep">›</span>
+  <span class="nav-crumb">GL Architecture Series</span>
+  <!-- TO BE DESIGNED: Get in Touch page -->
+  <a href="https://simplitconsulting.com/contact/" style="margin-left:auto;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border:1px solid #581C0C;color:#C03010;border-radius:2px;text-decoration:none;transition:all .18s">Get in Touch</a>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-kicker">Oracle Fusion Cloud ERP · General Ledger</div>
+    <h1>Oracle Fusion GL<br><span>Architecture Series</span></h1>
+    <p class="hero-sub">Three articles on the structural decisions that determine what your Oracle Fusion General Ledger can — and cannot — do for the life of your implementation. Supported by interactive tools, configuration guides, and white papers.</p>
+    <div class="hero-stats">
+      <div class="h-stat">
+        <span class="h-stat-num">3</span>
+        <span class="h-stat-lbl">Articles in the series</span>
+      </div>
+      <div class="h-stat">
+        <span class="h-stat-num">5</span>
+        <span class="h-stat-lbl">Interactive tools</span>
+      </div>
+      <div class="h-stat">
+        <span class="h-stat-num">3</span>
+        <span class="h-stat-lbl">White papers &amp; guides</span>
+      </div>
+      <div class="h-stat">
+        <span class="h-stat-num">13</span>
+        <span class="h-stat-lbl">Secondary ledger use cases</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- BLOG ARTICLES -->
+  <div class="section-label">The Three Articles</div>
+
+  <div class="blog-cards">
+
+    <a class="blog-card p1-card" href="https://simplitconsulting.com/why-one-balancing-segment-was-never-enough/">
+      <div class="bc-num-cell"><span class="bc-num p1-num">1</span></div>
+      <div class="bc-body">
+        <span class="bc-series-tag" style="color:var(--p1)">Foundation Layer · Balancing Segments</span>
+        <div class="bc-title">Why One Balancing Segment Was Never Enough</div>
+        <div class="bc-desc">How Oracle Fusion enforces financial accountability across multiple dimensions simultaneously — and why the single-segment approach that most R12 implementations used leaves value on the table.</div>
+        <div class="bc-meta">
+          <span class="bc-tag tag-live">Live</span>
+          <span class="bc-tag tag-read">12 min read</span>
+        </div>
+      </div>
+      <div class="bc-arrow">→</div>
+    </a>
+
+    <a class="blog-card p2-card" href="https://simplitconsulting.com/the-ledger-that-runs-in-parallel/">
+      <div class="bc-num-cell"><span class="bc-num p2-num">2</span></div>
+      <div class="bc-body">
+        <span class="bc-series-tag" style="color:var(--p2)">Parallel Accounting Layer · Secondary Ledgers</span>
+        <div class="bc-title">The Ledger That Runs in Parallel</div>
+        <div class="bc-desc">Oracle Fusion Secondary Ledgers and the accounting policy problem they solve — thirteen use cases, the R12 workarounds they replace, quantified KPIs, and what changes across SAP, D365, and NetSuite migrations.</div>
+        <div class="bc-meta">
+          <span class="bc-tag tag-new">New</span>
+          <span class="bc-tag tag-read">18 min read</span>
+        </div>
+      </div>
+      <div class="bc-arrow">→</div>
+    </a>
+
+    <a class="blog-card p3-card" href="https://simplitconsulting.com/what-is-a-ledger/">
+      <div class="bc-num-cell"><span class="bc-num p3-num">3</span></div>
+      <div class="bc-body">
+        <span class="bc-series-tag" style="color:var(--p3)">Core Object · Ledger Definitions</span>
+        <div class="bc-title">What Is a Ledger in Oracle Fusion — and Why It Matters More Than You Think</div>
+        <div class="bc-desc">The 4C Framework, the four ledger types, the shared ledger question, Legal Entity vs Business Unit vs Ledger — and the design decisions that cannot be undone once transactions are posted.</div>
+        <div class="bc-meta">
+          <span class="bc-tag tag-new">New</span>
+          <span class="bc-tag tag-read">16 min read</span>
+        </div>
+      </div>
+      <div class="bc-arrow">→</div>
+    </a>
+
+  </div>
+
+  <!-- INTERACTIVE TOOLS -->
+  <div class="section-label">Interactive Tools — Hosted on GitHub</div>
+
+  <div class="tools-grid">
+
+    <a class="tool-card" href="https://shameembauccha.github.io/Gl-Architecture/balancing-segments-explorer-complete.html" target="_blank" rel="noopener">
+      <div class="tc-header">
+        <div class="tc-icon tc-icon-blue">🔷</div>
+        <div class="tc-header-text">
+          <span class="tc-type">Interactive Explorer</span>
+          <div class="tc-title">Balancing Segments Explorer</div>
+        </div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-desc">Explore how primary, secondary, and tertiary balancing segments work in Oracle Fusion — with live examples across different organisational structures and segment configurations.</div>
+      </div>
+      <div class="tc-footer">
+        <span class="tc-host">GitHub Pages</span>
+        <span class="tc-link-label">Open tool →</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="https://shameembauccha.github.io/Gl-Architecture/ledger-decision-tree.html" target="_blank" rel="noopener">
+      <div class="tc-header">
+        <div class="tc-icon tc-icon-gold">🌿</div>
+        <div class="tc-header-text">
+          <span class="tc-type">Decision Tree</span>
+          <div class="tc-title">Ledger Design Decision Tree</div>
+        </div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-desc">Answer four questions about your organisation — primary vs shared ledger, secondary vs reporting currency, conversion level, number of secondary ledgers — and receive a specific architecture recommendation.</div>
+      </div>
+      <div class="tc-footer">
+        <span class="tc-host">GitHub Pages</span>
+        <span class="tc-link-label">Open tool →</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-config-guide.html" target="_blank" rel="noopener">
+      <div class="tc-header">
+        <div class="tc-icon tc-icon-oracle">⚙️</div>
+        <div class="tc-header-text">
+          <span class="tc-type">Configuration Guide</span>
+          <div class="tc-title">Secondary Ledger Setup Guide</div>
+        </div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-desc">Phase 1 base setup (8 steps) and Phase 2 SLA rule authoring for all six subledgers — GL, AP, AR, Fixed Assets, Cost Accounting, Projects — with navigation paths, field tables, and checkpoints.</div>
+      </div>
+      <div class="tc-footer">
+        <span class="tc-host">GitHub Pages</span>
+        <span class="tc-link-label">Open guide →</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-recon-guide.html" target="_blank" rel="noopener">
+      <div class="tc-header">
+        <div class="tc-icon tc-icon-green">📊</div>
+        <div class="tc-header-text">
+          <span class="tc-type">Period Close Guide</span>
+          <div class="tc-title">Reconciliation Report Guide</div>
+        </div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-desc">Five variance types, investigation workflow, threshold recommendations by use case, and an interactive period-close checklist. For finance teams running secondary ledger reconciliation every month.</div>
+      </div>
+      <div class="tc-footer">
+        <span class="tc-host">GitHub Pages</span>
+        <span class="tc-link-label">Open guide →</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-use-cases.html" target="_blank" rel="noopener">
+      <div class="tc-header">
+        <div class="tc-icon tc-icon-purple">🗂</div>
+        <div class="tc-header-text">
+          <span class="tc-type">Interactive Explorer</span>
+          <div class="tc-title">13 Secondary Ledger Use Cases</div>
+        </div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-desc">Every parallel accounting scenario — IFRS vs local GAAP, IFRS 9, IFRS 16, IAS 29, JV gross reporting, pre-consolidation staging, and more. Each use case has scenario, SLA rules, accounting entries, and KPIs.</div>
+      </div>
+      <div class="tc-footer">
+        <span class="tc-host">GitHub Pages</span>
+        <span class="tc-link-label">Open explorer →</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- WHITE PAPERS -->
+  <div class="section-label">White Papers &amp; Technical Documents</div>
+
+  <div class="papers-list">
+
+    <a class="paper-item" href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Multiple-Balancing-Segments-White-Paper-v1.0.pdf" target="_blank" rel="noopener">
+      <div class="pi-icon">📄</div>
+      <div class="pi-body">
+        <div class="pi-title">Multiple Balancing Segments — White Paper v1.0</div>
+        <div class="pi-desc">Technical reference for implementing primary, secondary, and tertiary balancing segments in Oracle Fusion. Covers configuration, use cases, and design principles.</div>
+      </div>
+      <div class="pi-meta">
+        <span class="pi-tag pi-tag-live">Available</span>
+        <span class="pi-size">PDF · Simpl'IT Media</span>
+      </div>
+    </a>
+
+    <a class="paper-item" href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Secondary-Ledger-Set-Up-Final.pdf" target="_blank" rel="noopener">
+      <div class="pi-icon">📄</div>
+      <div class="pi-body">
+        <div class="pi-title">Secondary Ledger Setup — Technical Guide</div>
+        <div class="pi-desc">Complete configuration reference for Oracle Fusion Secondary Ledgers — base setup, SLA rule authoring, CoA mapping, and period close procedures across all subledgers.</div>
+      </div>
+      <div class="pi-meta">
+        <span class="pi-tag pi-tag-soon">Coming Soon</span>
+        <span class="pi-size">PDF · Simpl'IT Media</span>
+      </div>
+    </a>
+
+    <a class="paper-item" href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Ledger-Set-Up-Final.pdf" target="_blank" rel="noopener">
+      <div class="pi-icon">📄</div>
+      <div class="pi-body">
+        <div class="pi-title">Ledger Setup — Technical Guide</div>
+        <div class="pi-desc">Technical reference for Oracle Fusion ledger design — the 4C Framework, ledger types, shared ledger conditions, Legal Entity structure, and the one-way design decisions.</div>
+      </div>
+      <div class="pi-meta">
+        <span class="pi-tag pi-tag-soon">Coming Soon</span>
+        <span class="pi-size">PDF · Simpl'IT Media</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ABOUT -->
+  <div class="about-band">
+    <div>
+      <div class="about-author">
+        <div class="about-avatar">SB</div>
+        <div>
+          <a class="about-name" href="https://www.linkedin.com/in/shameemakhtar/" target="_blank" rel="noopener" style="text-decoration:none;color:var(--ink2);display:flex;align-items:center;gap:6px">Shameem Bauccha <span style="font-size:10px;opacity:.5">↗</span></a>
+          <div class="about-role">Oracle Fusion GL · Finance Transformation · Simpl'IT Consulting</div>
+        </div>
+      </div>
+      <p class="about-text">This series distils the design and configuration decisions that determine whether an Oracle Fusion General Ledger implementation delivers on its promise — or creates technical debt that compounds over years. The articles, tools, and guides are built from direct implementation experience across industries, geographies, and migration paths from R12, SAP, D365, and NetSuite.</p>
+    </div>
+    <div class="about-cta">
+      <div class="about-cta-title">Working on a Fusion GL implementation?</div>
+      <div class="about-cta-desc">Simpl'IT Consulting provides design review, configuration, and implementation support for Oracle Fusion Finance.</div>
+      <!-- TO BE DESIGNED: Get in Touch page -->
+      <a class="btn-cta" href="https://simplitconsulting.com/contact/">Get in Touch</a>
+      <a class="btn-outline" href="https://simplitconsulting.com/blog">All Articles</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

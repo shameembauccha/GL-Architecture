@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secondary Ledger — 13 Use Cases | Oracle Fusion GL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,600&family=Barlow:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09080A;
+  --rail:#0F0D10;
+  --surface:#141215;
+  --surface2:#1A171C;
+  --surface3:#201D22;
+  --border:#2A2630;
+  --border2:#38323E;
+  --ink:#F2EDF8;
+  --ink2:#C4B8D4;
+  --ink3:#7A6E8A;
+  --ink4:#4A4258;
+  --ink5:#2E2838;
+  --oracle:#C03828;
+  --oracle-lt:#E04830;
+  --oracle-pale:#1E0806;
+  --oracle-border:#4A1008;
+  --blue:#3060A8;
+  --blue-lt:#4A80C8;
+  --blue-pale:#080E1C;
+  --gold:#B88A08;
+  --gold-lt:#D8A820;
+  --gold-pale:#140E00;
+  --gold-border:#382400;
+  --green:#18683A;
+  --green-lt:#28A060;
+  --green-pale:#081008;
+  --purple:#6030A0;
+  --purple-lt:#8050C0;
+  --purple-pale:#0C0818;
+  --teal:#107878;
+  --teal-lt:#18A8A8;
+  --r:3px;
+}
+
+html{height:100%}
+body{
+  font-family:'Barlow',sans-serif;
+  background:var(--bg);color:var(--ink);
+  height:100%;display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── TOP NAV ── */
+.topnav{
+  background:var(--rail);
+  border-bottom:1px solid var(--border);
+  padding:9px 20px;
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;z-index:100;
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+}
+.tn-logo{color:var(--gold-lt);text-decoration:none;font-weight:500}
+.tn-logo:hover{color:var(--gold-lt)}
+.tn-sep{color:var(--border2)}
+.tn-crumb{color:var(--ink4);text-decoration:none}
+.tn-crumb:hover{color:var(--ink3)}
+.tn-current{color:var(--ink3)}
+.tn-right{margin-left:auto;display:flex;gap:6px;align-items:center}
+.tn-btn{color:var(--blue-lt);text-decoration:none;padding:3px 10px;border:1px solid #1E2840;border-radius:2px;transition:all .15s}
+.tn-btn:hover{border-color:var(--blue-lt);color:var(--ink2)}
+.tn-contact{color:var(--oracle);border-color:var(--oracle-border);padding:3px 10px;border:1px solid var(--oracle-border);border-radius:2px;text-decoration:none;transition:all .15s}
+.tn-contact:hover{background:var(--oracle);color:#fff}
+
+/* ── SHELL ── */
+.shell{flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--rail);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sb-head{
+  padding:20px 20px 16px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.sb-head-label{
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:6px;
+}
+.sb-head-title{
+  font-family:'Fraunces',serif;font-size:17px;font-weight:600;
+  color:var(--ink);line-height:1.25;
+}
+.sb-head-sub{font-size:11px;color:var(--ink4);margin-top:4px;line-height:1.5}
+
+.sb-scroll{flex:1;overflow-y:auto;padding:8px 0}
+.sb-scroll::-webkit-scrollbar{width:4px}
+.sb-scroll::-webkit-scrollbar-track{background:transparent}
+.sb-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.sb-group{margin-bottom:4px}
+.sb-group-label{
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink5);padding:10px 20px 5px;
+}
+.sb-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 20px;cursor:pointer;
+  border-left:2px solid transparent;
+  transition:all .15s;
+}
+.sb-item:hover{background:var(--surface);border-left-color:var(--border2)}
+.sb-item.active{background:var(--surface2);border-left-color:var(--gold-lt)}
+.sb-item.active .sb-num{color:var(--gold-lt)}
+.sb-item.active .sb-name{color:var(--ink)}
+.sb-num{
+  font-family:'DM Mono',monospace;font-size:9px;
+  color:var(--ink5);flex-shrink:0;margin-top:2px;
+  width:18px;
+}
+.sb-name{font-size:12px;font-weight:500;color:var(--ink3);line-height:1.4}
+.sb-item:hover .sb-name{color:var(--ink2)}
+.sb-tag{
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:.06em;text-transform:uppercase;
+  padding:1px 6px;border-radius:1px;
+  border:1px solid;margin-top:2px;display:inline-block;
+}
+
+.sb-footer{
+  padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;
+}
+.sb-footer-links{display:flex;flex-direction:column;gap:5px}
+.sb-footer-link{
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink4);text-decoration:none;
+  display:flex;align-items:center;gap:5px;
+  transition:color .15s;
+}
+.sb-footer-link:hover{color:var(--blue-lt)}
+
+/* ── MAIN ── */
+.main{
+  overflow-y:auto;display:flex;flex-direction:column;
+}
+.main::-webkit-scrollbar{width:6px}
+.main::-webkit-scrollbar-track{background:var(--bg)}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── OVERVIEW PANEL ── */
+.overview{padding:48px 56px;max-width:960px;animation:fadeIn .3s ease}
+.ov-kicker{
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--oracle);margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+}
+.ov-kicker::before{content:'';display:inline-block;width:24px;height:1px;background:var(--oracle)}
+.ov-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(28px,4vw,44px);
+  font-weight:600;color:var(--ink);
+  line-height:1.12;letter-spacing:-.02em;
+  margin-bottom:16px;
+}
+.ov-title em{font-style:italic;color:var(--gold-lt)}
+.ov-desc{font-size:16px;color:var(--ink3);line-height:1.75;max-width:700px;margin-bottom:40px}
+
+.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:40px}
+.ov-stat{background:var(--surface);padding:20px 16px;text-align:center}
+.ov-stat-num{
+  font-family:'Fraunces',serif;
+  font-size:38px;font-weight:600;
+  color:var(--gold-lt);display:block;
+  line-height:1;margin-bottom:5px;
+}
+.ov-stat-lbl{
+  font-family:'DM Mono',monospace;
+  font-size:8px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink4);
+  line-height:1.5;
+}
+
+.ov-table-wrap{overflow-x:auto;margin-bottom:32px}
+.ov-table{width:100%;border-collapse:collapse;font-size:12px}
+.ov-table th{
+  background:var(--surface2);
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink4);padding:9px 12px;
+  text-align:left;border-bottom:1px solid var(--border2);
+  white-space:nowrap;
+}
+.ov-table td{
+  padding:9px 12px;border-bottom:1px solid var(--border);
+  vertical-align:middle;color:var(--ink3);line-height:1.45;
+}
+.ov-table tr:last-child td{border-bottom:none}
+.ov-table tr:hover td{background:var(--surface);cursor:pointer}
+.ov-table td:first-child{
+  font-family:'DM Mono',monospace;font-size:9px;
+  color:var(--ink4);white-space:nowrap;
+}
+.ov-table td:nth-child(2){
+  font-weight:600;color:var(--ink2);
+}
+.ov-table .ov-row-btn{
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--blue-lt);cursor:pointer;white-space:nowrap;
+}
+.kpi-chip{
+  font-family:'DM Mono',monospace;font-size:9px;
+  color:var(--green-lt);background:var(--green-pale);
+  border:1px solid var(--green);padding:1px 6px;
+  border-radius:1px;white-space:nowrap;
+}
+.sub-chip{
+  font-family:'DM Mono',monospace;font-size:8px;
+  padding:1px 6px;border-radius:1px;border:1px solid;
+  margin:1px;display:inline-block;white-space:nowrap;
+}
+
+/* ── USE CASE PANEL ── */
+.uc-panel{padding:0;flex:1;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.uc-header{
+  padding:32px 52px 28px;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:10;
+  background:var(--bg);
+}
+.uc-breadcrumb{
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.uc-num{
+  font-family:'Fraunces',serif;
+  font-size:11px;font-weight:600;
+  color:var(--gold-lt);
+  background:var(--gold-pale);
+  border:1px solid var(--gold-border);
+  padding:2px 10px;border-radius:2px;
+}
+.uc-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(22px,3vw,32px);
+  font-weight:600;color:var(--ink);
+  line-height:1.15;letter-spacing:-.02em;
+  margin-bottom:10px;
+}
+.uc-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:1px;border:1px solid;
+}
+.badge-oracle{background:var(--oracle-pale);border-color:var(--oracle-border);color:var(--oracle-lt)}
+.badge-blue{background:var(--blue-pale);border-color:#1E2840;color:var(--blue-lt)}
+.badge-gold{background:var(--gold-pale);border-color:var(--gold-border);color:var(--gold-lt)}
+.badge-purple{background:var(--purple-pale);border-color:#2A1848;color:var(--purple-lt)}
+.badge-teal{background:#081010;border-color:#183028;color:var(--teal-lt)}
+.badge-green{background:var(--green-pale);border-color:#182818;color:var(--green-lt)}
+
+.uc-nav-btns{
+  display:flex;gap:8px;margin-top:12px;
+  padding-top:12px;border-top:1px solid var(--border);
+}
+.uc-nav-btn{
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 12px;border:1px solid var(--border2);
+  border-radius:2px;color:var(--ink4);cursor:pointer;
+  background:transparent;transition:all .15s;
+}
+.uc-nav-btn:hover{border-color:var(--ink3);color:var(--ink2)}
+.uc-nav-btn.active{background:var(--surface2);border-color:var(--border2);color:var(--gold-lt)}
+
+/* ── CONTENT SECTIONS ── */
+.uc-content{padding:36px 52px 64px;max-width:900px}
+
+.section{display:none}
+.section.visible{display:block}
+
+.section-title{
+  font-family:'Fraunces',serif;
+  font-size:22px;font-weight:600;
+  color:var(--ink);margin-bottom:20px;
+  padding-bottom:12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.section-icon{
+  width:32px;height:32px;border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+
+/* Scenario */
+.scenario-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-left:3px solid var(--oracle);border-radius:0 var(--r) var(--r) 0;
+  padding:24px 28px;margin-bottom:24px;
+}
+.scenario-box p{font-size:15px;color:var(--ink2);line-height:1.75}
+
+.gap-box{
+  background:var(--oracle-pale);border:1px solid var(--oracle-border);
+  border-radius:var(--r);padding:16px 20px;margin-bottom:16px;
+  display:flex;gap:12px;
+}
+.gap-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.gap-label{
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--oracle-lt);margin-bottom:4px;display:block;
+}
+.gap-box p{font-size:13px;color:var(--ink3);line-height:1.6;margin:0}
+
+/* Config */
+.config-steps{display:flex;flex-direction:column;gap:0;margin-bottom:24px}
+.config-step{display:flex;gap:0;align-items:stretch}
+.step-line{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0}
+.step-circle{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:9px;
+  font-weight:500;color:#fff;flex-shrink:0;margin-top:3px;
+}
+.step-connector{flex:1;width:1px;background:var(--border);margin:4px 0}
+.config-step:last-child .step-connector{display:none}
+.step-body{padding:0 0 20px 14px;flex:1}
+.step-body h4{
+  font-family:'Barlow',sans-serif;font-size:14px;
+  font-weight:700;color:var(--ink);margin-bottom:4px;
+}
+.step-body p{font-size:13px;color:var(--ink3);line-height:1.6;margin:0}
+.step-nav{
+  font-family:'DM Mono',monospace;font-size:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:2px;padding:3px 8px;
+  color:var(--blue-lt);display:inline-block;margin-top:5px;
+}
+
+/* SLA */
+.sla-rule{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;margin-bottom:12px;
+}
+.sla-rule-header{
+  background:var(--surface2);border-bottom:1px solid var(--border);
+  padding:10px 16px;display:flex;align-items:center;gap:10px;
+}
+.sla-rule-type{
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 7px;border-radius:1px;border:1px solid;
+}
+.sla-type-jlr{color:var(--blue-lt);border-color:#1E2840;background:var(--blue-pale)}
+.sla-type-adr{color:var(--gold-lt);border-color:var(--gold-border);background:var(--gold-pale)}
+.sla-type-slam{color:var(--purple-lt);border-color:#2A1848;background:var(--purple-pale)}
+.sla-type-cond{color:var(--teal-lt);border-color:#183028;background:#081010}
+.sla-rule-name{font-size:13px;font-weight:600;color:var(--ink2)}
+.sla-rule-body{padding:12px 16px}
+.sla-rule-body ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.sla-rule-body li{
+  font-size:12px;color:var(--ink3);line-height:1.55;
+  padding-left:14px;position:relative;
+}
+.sla-rule-body li::before{
+  content:'›';position:absolute;left:0;
+  color:var(--ink4);font-size:11px;
+}
+
+/* Entries */
+.entry-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+.entry-table th{
+  background:var(--surface2);
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink4);padding:8px 12px;
+  text-align:left;border-bottom:1px solid var(--border2);
+}
+.entry-table td{
+  padding:8px 12px;border-bottom:1px solid var(--border);
+  color:var(--ink3);vertical-align:top;line-height:1.45;
+}
+.entry-table tr:last-child td{border-bottom:none}
+.entry-ledger{
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:1px;
+}
+.el-primary{color:var(--blue-lt);background:var(--blue-pale);border:1px solid #1E2840}
+.el-secondary{color:var(--oracle-lt);background:var(--oracle-pale);border:1px solid var(--oracle-border)}
+.entry-dr{color:var(--ink);font-weight:600}
+.entry-cr{color:var(--ink3);padding-left:20px}
+.entry-acct{font-family:'DM Mono',monospace;font-size:10px;color:var(--blue-lt)}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.kpi-grid{grid-template-columns:1fr}}
+.kpi-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px 18px;
+  border-left:3px solid var(--green);
+}
+.kpi-value{
+  font-family:'Fraunces',serif;font-size:26px;
+  font-weight:600;color:var(--green-lt);
+  line-height:1;margin-bottom:5px;display:block;
+}
+.kpi-label{font-size:12px;color:var(--ink3);line-height:1.5}
+
+/* Pitfalls callout */
+.callout{
+  border-radius:var(--r);padding:14px 18px;
+  display:flex;gap:10px;margin-bottom:12px;
+}
+.c-warn{background:var(--oracle-pale);border:1px solid var(--oracle-border)}
+.c-info{background:var(--blue-pale);border:1px solid #1E2840}
+.callout-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.callout-inner{}
+.callout-label{
+  font-family:'DM Mono',monospace;font-size:8px;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--oracle);margin-bottom:4px;display:block;
+}
+.c-info .callout-label{color:var(--blue-lt)}
+.callout p{font-size:13px;color:var(--ink3);line-height:1.6;margin:0}
+
+/* Back to overview btn */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink4);cursor:pointer;padding:4px 0;
+  transition:color .15s;border:none;background:transparent;
+  margin-bottom:4px;
+}
+.back-btn:hover{color:var(--gold-lt)}
+
+/* Hidden */
+.hidden{display:none!important}
+
+@media(max-width:800px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .uc-header,.uc-content,.overview{padding-left:20px;padding-right:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <a class="tn-logo" href="https://simplitconsulting.com">Simpl'IT</a>
+  <span class="tn-sep">›</span>
+  <a class="tn-crumb" href="https://simplitconsulting.com/blog">Blog</a>
+  <span class="tn-sep">›</span>
+  <a class="tn-crumb" href="https://simplitconsulting.com/gl-architecture-series/">GL Series</a>
+  <span class="tn-sep">›</span>
+  <span class="tn-current">13 Use Cases</span>
+  <div class="tn-right">
+    <a class="tn-btn" href="https://simplitconsulting.com/the-ledger-that-runs-in-parallel/">Secondary Ledger Article</a>
+    <a class="tn-btn" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-config-guide.html" target="_blank" rel="noopener">Config Guide</a>
+    <a class="tn-btn" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-recon-guide.html" target="_blank" rel="noopener">Recon Guide</a>
+    <a class="tn-btn" href="https://shameembauccha.github.io/Gl-Architecture/ledger-decision-tree.html" target="_blank" rel="noopener">Decision Tree</a>
+    <a class="tn-contact" href="https://simplitconsulting.com/contact/">Get in Touch</a>
+  </div>
+</div>
+
+<div class="shell">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar">
+  <div class="sb-head">
+    <div class="sb-head-label">Oracle Fusion · Secondary Ledger</div>
+    <div class="sb-head-title">13 Use Cases</div>
+    <div class="sb-head-sub">Click a use case to explore scenario, config steps, SLA rules, accounting entries, and KPIs</div>
+  </div>
+
+  <div class="sb-scroll">
+
+    <div class="sb-group">
+      <div class="sb-group-label">Overview</div>
+      <div class="sb-item active" onclick="showOverview(this)">
+        <span class="sb-num">—</span>
+        <span class="sb-name">All 13 Use Cases — Summary Table</span>
+      </div>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-label">Statutory &amp; Regulatory</div>
+      <div class="sb-item" onclick="showCase(1,this)">
+        <div><span class="sb-num">01</span></div>
+        <div><span class="sb-name">IFRS vs Local GAAP Statutory Reporting</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(2,this)">
+        <div><span class="sb-num">02</span></div>
+        <div><span class="sb-name">Fixed Asset Component vs Pooled Depreciation</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(7,this)">
+        <div><span class="sb-num">07</span></div>
+        <div><span class="sb-name">IFRS 16 vs Operating Lease (Local GAAP)</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(8,this)">
+        <div><span class="sb-num">08</span></div>
+        <div><span class="sb-name">Tax Ledger — Accelerated Depreciation &amp; Deferred Tax</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(9,this)">
+        <div><span class="sb-num">09</span></div>
+        <div><span class="sb-name">Hyperinflationary Economy (IAS 29)</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(13,this)">
+        <div><span class="sb-num">13</span></div>
+        <div><span class="sb-name">Government Grants — IAS 20 vs Immediate Recognition</span></div>
+      </div>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-label">Costing &amp; Operations</div>
+      <div class="sb-item" onclick="showCase(3,this)">
+        <div><span class="sb-num">03</span></div>
+        <div><span class="sb-name">Standard vs Actual / Weighted-Average Costing</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(4,this)">
+        <div><span class="sb-num">04</span></div>
+        <div><span class="sb-name">AP/AR — Prepayments, Deferred Revenue &amp; WHT</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(5,this)">
+        <div><span class="sb-num">05</span></div>
+        <div><span class="sb-name">Project Revenue — IFRS 15 vs Local GAAP POC</span></div>
+      </div>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-label">Group &amp; Consolidation</div>
+      <div class="sb-item" onclick="showCase(6,this)">
+        <div><span class="sb-num">06</span></div>
+        <div><span class="sb-name">Intercompany Elimination vs Retention</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(10,this)">
+        <div><span class="sb-num">10</span></div>
+        <div><span class="sb-name">Joint Venture — Working Interest vs Gross Reporting</span></div>
+      </div>
+      <div class="sb-item" onclick="showCase(12,this)">
+        <div><span class="sb-num">12</span></div>
+        <div><span class="sb-name">Pre-Consolidation Staging (Adjustment-Only Ledger)</span></div>
+      </div>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-label">Financial Instruments</div>
+      <div class="sb-item" onclick="showCase(11,this)">
+        <div><span class="sb-num">11</span></div>
+        <div><span class="sb-name">IFRS 9 — ECL vs Incurred Loss &amp; Fair Value</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-footer-links">
+      <a class="sb-footer-link" href="https://simplitconsulting.com/the-ledger-that-runs-in-parallel/">← Secondary Ledger Article</a>
+      <a class="sb-footer-link" href="https://simplitconsulting.com/gl-architecture-series/">← GL Series Index</a>
+      <a class="sb-footer-link" href="https://shameembauccha.github.io/Gl-Architecture/ledger-decision-tree.html" target="_blank" rel="noopener">↗ Decision Tree</a>
+      <a class="sb-footer-link" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-config-guide.html" target="_blank" rel="noopener">↗ Configuration Guide</a>
+      <a class="sb-footer-link" href="https://shameembauccha.github.io/Gl-Architecture/secondary-ledger-recon-guide.html" target="_blank" rel="noopener">↗ Reconciliation Guide</a>
+      <a class="sb-footer-link" href="http://simplitconsulting.com/wp-content/uploads/FIN/GL_Architecture/Secondary-Ledger-Set-Up-Final.pdf" target="_blank" rel="noopener">↗ White Paper (PDF)</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="main" id="mainPanel">
+
+<!-- OVERVIEW -->
+<div id="panel-overview" class="overview">
+  <div class="ov-kicker">Oracle Fusion Secondary Ledger</div>
+  <h1 class="ov-title">13 Use Cases for<br><em>Parallel Accounting</em></h1>
+  <p class="ov-desc">Every scenario where one organisation needs two sets of accounting records for the same transaction — and how Oracle Fusion's Secondary Ledger architecture resolves each one without manual journals, shadow systems, or spreadsheet reconciliation.</p>
+
+  <div class="ov-grid">
+    <div class="ov-stat"><span class="ov-stat-num">13</span><span class="ov-stat-lbl">Documented use cases</span></div>
+    <div class="ov-stat"><span class="ov-stat-num">~100%</span><span class="ov-stat-lbl">Manual bridge journals eliminated</span></div>
+    <div class="ov-stat"><span class="ov-stat-num">6</span><span class="ov-stat-lbl">Subledgers covered</span></div>
+    <div class="ov-stat"><span class="ov-stat-num">4</span><span class="ov-stat-lbl">Conversion levels</span></div>
+  </div>
+
+  <div class="ov-table-wrap">
+    <table class="ov-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Use Case</th>
+          <th>Category</th>
+          <th>Subledger</th>
+          <th>Headline KPI</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="showCase(1,null)">
+          <td>01</td>
+          <td>IFRS vs Local GAAP Statutory Reporting</td>
+          <td><span class="sub-chip" style="color:var(--oracle-lt);border-color:var(--oracle-border)">Statutory</span></td>
+          <td>All</td>
+          <td><span class="kpi-chip">Close time −25–40%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(2,null)">
+          <td>02</td>
+          <td>Fixed Asset Component vs Pooled Depreciation</td>
+          <td><span class="sub-chip" style="color:var(--oracle-lt);border-color:var(--oracle-border)">Statutory</span></td>
+          <td>Fixed Assets</td>
+          <td><span class="kpi-chip">Manual entries −100%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(3,null)">
+          <td>03</td>
+          <td>Standard vs Actual / Weighted-Average Costing</td>
+          <td><span class="sub-chip" style="color:var(--blue-lt);border-color:#1E2840">Costing</span></td>
+          <td>Cost Accounting</td>
+          <td><span class="kpi-chip">Recon time −60%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(4,null)">
+          <td>04</td>
+          <td>AP/AR — Prepayments, Deferred Revenue &amp; WHT</td>
+          <td><span class="sub-chip" style="color:var(--blue-lt);border-color:#1E2840">Costing</span></td>
+          <td>AP / AR</td>
+          <td><span class="kpi-chip">Error rate &lt;0.5%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(5,null)">
+          <td>05</td>
+          <td>Project Revenue — IFRS 15 vs Local GAAP POC</td>
+          <td><span class="sub-chip" style="color:var(--blue-lt);border-color:#1E2840">Costing</span></td>
+          <td>Projects</td>
+          <td><span class="kpi-chip">Manual adj −70%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(6,null)">
+          <td>06</td>
+          <td>Intercompany Elimination vs Retention</td>
+          <td><span class="sub-chip" style="color:var(--gold-lt);border-color:var(--gold-border)">Group</span></td>
+          <td>GL / AP / AR</td>
+          <td><span class="kpi-chip">IC exceptions −75%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(7,null)">
+          <td>07</td>
+          <td>IFRS 16 vs Operating Lease (Local GAAP)</td>
+          <td><span class="sub-chip" style="color:var(--oracle-lt);border-color:var(--oracle-border)">Statutory</span></td>
+          <td>Fixed Assets</td>
+          <td><span class="kpi-chip">Lease entries −100%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(8,null)">
+          <td>08</td>
+          <td>Tax Ledger — Accelerated Depreciation &amp; Deferred Tax</td>
+          <td><span class="sub-chip" style="color:var(--oracle-lt);border-color:var(--oracle-border)">Statutory</span></td>
+          <td>Fixed Assets</td>
+          <td><span class="kpi-chip">DT calc time −40%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(9,null)">
+          <td>09</td>
+          <td>Hyperinflationary Economy (IAS 29)</td>
+          <td><span class="sub-chip" style="color:var(--oracle-lt);border-color:var(--oracle-border)">Statutory</span></td>
+          <td>GL</td>
+          <td><span class="kpi-chip">Restatement time −60%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(10,null)">
+          <td>10</td>
+          <td>Joint Venture — Working Interest vs Gross</td>
+          <td><span class="sub-chip" style="color:var(--gold-lt);border-color:var(--gold-border)">Group</span></td>
+          <td>Projects / GL</td>
+          <td><span class="kpi-chip">Gross-up effort −85%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(11,null)">
+          <td>11</td>
+          <td>IFRS 9 — ECL vs Incurred Loss &amp; Fair Value</td>
+          <td><span class="sub-chip" style="color:var(--purple-lt);border-color:#2A1848">Instruments</span></td>
+          <td>AR / GL</td>
+          <td><span class="kpi-chip">FV errors −70%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(12,null)">
+          <td>12</td>
+          <td>Pre-Consolidation Staging (Adjustment-Only)</td>
+          <td><span class="sub-chip" style="color:var(--gold-lt);border-color:var(--gold-border)">Group</span></td>
+          <td>GL (Adj Only)</td>
+          <td><span class="kpi-chip">Consol prep −30%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+        <tr onclick="showCase(13,null)">
+          <td>13</td>
+          <td>Government Grants — IAS 20 vs Immediate Recognition</td>
+          <td><span class="sub-chip" style="color:var(--oracle-lt);border-color:var(--oracle-border)">Statutory</span></td>
+          <td>AR / GL</td>
+          <td><span class="kpi-chip">Manual entries −80%</span></td>
+          <td class="ov-row-btn">Explore →</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── USE CASE PANELS ── -->
+
+<!-- UC 1 -->
+<div id="panel-1" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb">
+      <button class="back-btn" onclick="showOverview(null)">← All Use Cases</button>
+      <span class="uc-num">Use Case 01 of 13</span>
+    </div>
+    <div class="uc-title">IFRS vs Local GAAP<br>Statutory Reporting</div>
+    <div class="uc-badges">
+      <span class="badge badge-oracle">Statutory</span>
+      <span class="badge badge-blue">All Subledgers</span>
+      <span class="badge badge-gold">Subledger Conversion</span>
+    </div>
+    <div class="uc-nav-btns">
+      <button class="uc-nav-btn active" onclick="showSection(1,'scenario',this)">Scenario</button>
+      <button class="uc-nav-btn" onclick="showSection(1,'config',this)">Config Steps</button>
+      <button class="uc-nav-btn" onclick="showSection(1,'sla',this)">SLA Rules</button>
+      <button class="uc-nav-btn" onclick="showSection(1,'entries',this)">Accounting Entries</button>
+      <button class="uc-nav-btn" onclick="showSection(1,'kpis',this)">KPIs</button>
+    </div>
+  </div>
+  <div class="uc-content">
+    <div id="1-scenario" class="section visible">
+      <div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div>
+      <div class="scenario-box"><p>A multinational company maintains corporate books under IFRS (primary ledger). Local statutory reporting requires accounting under local GAAP — different provisions, different asset lives, different revenue recognition timing, different treatment of financial instruments. One transaction, two mandatory sets of accounting records.</p></div>
+      <div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>CoA mapping between corporate and statutory CoA was a manual spreadsheet maintained outside the system. SLA was available but under-configured — most implementations produced identical entries in both ledgers, defeating the purpose. Reconciliation was entirely offline.</p></div></div>
+    </div>
+    <div id="1-config" class="section">
+      <div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div>
+      <div class="config-steps">
+        <div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Create Secondary Ledger</h4><p>Accounting Configurations › Manage Accounting Configurations. Set conversion level to <strong>Subledger</strong> — required for transaction-level accounting differences between IFRS and local GAAP.</p><span class="step-nav">Setup &amp; Maintenance › Manage Accounting Configurations</span></div></div>
+        <div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Define CoA Mapping Set</h4><p>Map each primary CoA segment to the statutory CoA segment. Define rollup rules for many-to-one relationships and account-level exceptions where IFRS and local stat accounts diverge.</p><span class="step-nav">Setup &amp; Maintenance › Manage Chart of Accounts Mapping Sets</span></div></div>
+        <div class="config-step"><div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div><div class="step-body"><h4>Create Dedicated SLAM</h4><p>Create LOCAL_GAAP_SLAM. Assign to the secondary ledger in Accounting Configurations. This SLAM hosts all JLRs that produce different accounting in the statutory book.</p><span class="step-nav">Setup &amp; Maintenance › Manage Subledger Accounting Methods</span></div></div>
+        <div class="config-step"><div class="step-line"><div class="step-circle">4</div><div class="step-connector"></div></div><div class="step-body"><h4>Open Secondary Period &amp; Activate Close Monitor</h4><p>Open secondary ledger period before any transaction processing. Configure Close Monitor thresholds — target &lt;0.1% unexplained inter-ledger variance for statutory use cases.</p><span class="step-nav">GL › Period Close › Close Monitor</span></div></div>
+      </div>
+    </div>
+    <div id="1-sla" class="section">
+      <div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div>
+      <div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Provision Expense — Secondary (Local GAAP)</span></div><div class="sla-rule-body"><ul><li>Navigate: Setup and Maintenance › Manage Subledger Accounting Journal Line Rules</li><li>Create JLR for each accounting line that differs — Provision Expense, Lease Liability, asset impairment</li><li>Set Accounting Line Type (Debit/Credit) and assign local GAAP account via ADR</li><li>Condition: Ledger = Secondary. Priority must be higher than default rule</li></ul></div></div>
+      <div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-adr">ADR</span><span class="sla-rule-name">Local Statutory Account Derivation</span></div><div class="sla-rule-body"><ul><li>Navigate: Setup and Maintenance › Manage Subledger Accounting Account Rules</li><li>Create ADRs deriving local statutory accounts based on Legal Entity, Business Unit, or Transaction Type</li><li>Use Mapping Sets within ADRs to map corporate accounts to statutory accounts declaratively</li><li>Accounts that are identical in both books require no ADR — default mapping set handles them</li></ul></div></div>
+      <div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-slam">SLAM</span><span class="sla-rule-name">LOCAL_GAAP_SLAM Assignment</span></div><div class="sla-rule-body"><ul><li>Create dedicated SLAM: LOCAL_GAAP_SLAM</li><li>Assign SLAM to secondary ledger in Accounting Configurations</li><li>Use Priority and Conditions on JLRs to apply rules only when Ledger = Secondary</li><li>Test: run Create Accounting in Draft mode — confirm secondary entries differ from primary before go-live</li></ul></div></div>
+    </div>
+    <div id="1-entries" class="section">
+      <div class="section-title"><div class="section-icon" style="background:var(--teal-lt)00">📊</div>Accounting Entry Examples</div>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Provision for Bad Debt — IFRS ECL model vs local GAAP incurred loss</p>
+      <table class="entry-table">
+        <thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Amount</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">6900 ECL Expense</span></td><td class="entry-dr">Dr 150,000</td><td></td><td>12-month expected credit loss</td></tr>
+          <tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">1900 ECL Allowance</span></td><td class="entry-cr">Cr 150,000</td><td></td><td>ECL allowance account</td></tr>
+          <tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">7200 Specific Provision</span></td><td class="entry-dr">Dr 40,000</td><td></td><td>Incurred loss — identified debtor only</td></tr>
+          <tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">2800 Provision Account</span></td><td class="entry-cr">Cr 40,000</td><td></td><td>Local stat provision account</td></tr>
+        </tbody>
+      </table>
+      <div class="callout c-info"><span class="callout-icon">ℹ</span><div class="callout-inner"><span class="callout-label">Key Difference</span><p>The IFRS ECL amount (150k) and local GAAP incurred loss (40k) are genuinely different numbers requiring different journal entries. Without the secondary ledger, one of these is wrong — or both exist only in spreadsheets.</p></div></div>
+    </div>
+    <div id="1-kpis" class="section">
+      <div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><span class="kpi-value">25–40%</span><span class="kpi-label">Statutory close cycle time reduction vs manual workaround</span></div>
+        <div class="kpi-card"><span class="kpi-value">&lt;0.1%</span><span class="kpi-label">Ledger reconciliation variance — unexplained target</span></div>
+        <div class="kpi-card"><span class="kpi-value">−80%</span><span class="kpi-label">Audit findings related to statutory adjustments</span></div>
+        <div class="kpi-card"><span class="kpi-value">−30%</span><span class="kpi-label">Days to statutory sign-off post period-end</span></div>
+        <div class="kpi-card"><span class="kpi-value">−40%</span><span class="kpi-label">SLA rule maintenance effort per period (hours)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UC 2 -->
+<div id="panel-2" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 02 of 13</span></div>
+    <div class="uc-title">Fixed Asset Component Depreciation<br>vs Pooled Depreciation (IAS 16)</div>
+    <div class="uc-badges"><span class="badge badge-oracle">Statutory</span><span class="badge badge-blue">Fixed Assets</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns">
+      <button class="uc-nav-btn active" onclick="showSection(2,'scenario',this)">Scenario</button>
+      <button class="uc-nav-btn" onclick="showSection(2,'config',this)">Config Steps</button>
+      <button class="uc-nav-btn" onclick="showSection(2,'sla',this)">SLA Rules</button>
+      <button class="uc-nav-btn" onclick="showSection(2,'entries',this)">Accounting Entries</button>
+      <button class="uc-nav-btn" onclick="showSection(2,'kpis',this)">KPIs</button>
+    </div>
+  </div>
+  <div class="uc-content">
+    <div id="2-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>A company maintains IFRS-compliant fixed asset books with component-level accounting under IAS 16 (primary ledger: separate depreciation for Structure, Roof, Mechanical). Local statutory reporting does not require component-level accounting — one pooled depreciation charge per asset class is sufficient and required.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>Two separate asset books had to be manually reconciled at period end. Component assets in IFRS book had no automatic link to the pooled local stat book. Manual bridge journal volume per period was significant.</p></div></div></div>
+    <div id="2-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Create STAT_BOOK Asset Book</h4><p>Create a separate FA asset book assigned to the secondary ledger. Set book type to tax/statutory. Configure pooled depreciation methods (straight-line, declining balance) per asset category — no component split required.</p><span class="step-nav">Fixed Assets › Asset Books › Create</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Asset Category Mapping</h4><p>Map IFRS asset categories (BUILDING-STRUCTURE, BUILDING-ROOF, BUILDING-MECH) to consolidated statutory category (BUILDING). Depreciation in STAT_BOOK uses the pooled useful life and method.</p></div></div><div class="config-step"><div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div><div class="step-body"><h4>Assign SLA Method to STAT_BOOK</h4><p>Assign STAT_GAAP_SLAM to the STAT_BOOK asset book. This ensures FA depreciation run produces different journal entries in the secondary ledger from the primary IFRS component entries.</p></div></div></div></div>
+    <div id="2-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Component Depreciation Rules — Primary (IFRS)</span></div><div class="sla-rule-body"><ul><li>Create separate JLRs for each component: Structure Depreciation, Roof Depreciation, Mechanical Depreciation</li><li>Primary: IFRS component accounts using COMPONENT_TYPE attribute for account derivation</li><li>Condition: Book = CORP_BOOK (IFRS book). Ensures component rules fire only in primary</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Pooled Depreciation — Secondary (Local Stat)</span></div><div class="sla-rule-body"><ul><li>Single pooled depreciation JLR — local stat does not require component-level P&L split</li><li>Condition: Book = STAT_BOOK. ADR derives local statutory depreciation expense account</li><li>Amount derivation: statutory depreciation amount from STAT_BOOK, not IFRS component amount</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Gain/Loss on Disposal</span></div><div class="sla-rule-body"><ul><li>Primary (IFRS): recognize gain/loss net of component carrying amounts — separate ADR per component</li><li>Secondary (Stat): recognize based on single asset net book value, different account code</li><li>Create separate Disposal JLRs with Book condition to route correctly to each ledger</li></ul></div></div></div>
+    <div id="2-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Annual depreciation — building asset, IFRS component vs local stat pooled</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">7100 Structure Depr</span></td><td class="entry-dr">Dr 80,000</td><td>50yr useful life, component</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">7110 Roof Depr</span></td><td class="entry-dr">Dr 30,000</td><td>20yr useful life, component</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">7120 Mechanical Depr</span></td><td class="entry-dr">Dr 40,000</td><td>15yr useful life, component</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">0200 Accum Depr</span></td><td class="entry-cr">Cr 150,000</td><td>Total IFRS depreciation</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">7200 Building Depr</span></td><td class="entry-dr">Dr 120,000</td><td>25yr pooled life (stat)</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">0210 Accum Depr Stat</span></td><td class="entry-cr">Cr 120,000</td><td>Statutory accumulated depreciation</td></tr></tbody></table></div>
+    <div id="2-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">~100%</span><span class="kpi-label">Manual bridge journal entries eliminated</span></div><div class="kpi-card"><span class="kpi-value">100%</span><span class="kpi-label">IAS 16 audit compliance — all assets with compliant component analysis</span></div><div class="kpi-card"><span class="kpi-value">100%</span><span class="kpi-label">Depreciation variance between books explainable by policy difference</span></div><div class="kpi-card"><span class="kpi-value">−30%</span><span class="kpi-label">Fixed Assets sub-module close time per period</span></div><div class="kpi-card"><span class="kpi-value">&gt;99.5%</span><span class="kpi-label">Asset register accuracy across both books</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 3 -->
+<div id="panel-3" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 03 of 13</span></div>
+    <div class="uc-title">Standard Costing (Corporate)<br>vs Actual / Weighted-Average Costing (Statutory)</div>
+    <div class="uc-badges"><span class="badge badge-blue">Costing</span><span class="badge badge-blue">Cost Accounting</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(3,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(3,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(3,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(3,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(3,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="3-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>A manufacturing company uses Standard Costing in its primary ledger for corporate reporting and Actual/Weighted-Average Costing in the secondary ledger for local statutory compliance. Inventory valuation, PPV, and WIP accounting diverge materially between the two methods — requiring genuinely different journal entries for every inventory transaction.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>Separate costing organisations or manual parallel cost runs in Excel. No automated link between the standard-cost primary book and the actual-cost statutory book. Reconciliation consumed days per period; PPV accuracy was poor.</p></div></div></div>
+    <div id="3-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Create Two Cost Books</h4><p>CORP_BOOK (Standard Cost) assigned to primary ledger. STAT_BOOK (Actual/FIFO) assigned to secondary ledger. Assign appropriate cost method to each book in Cost Accounting configuration.</p><span class="step-nav">Cost Accounting › Manage Cost Books</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Assign SLAMs to Each Cost Book</h4><p>CORP_SLAM for CORP_BOOK handles standard cost accounting including PPV. STAT_SLAM for STAT_BOOK handles actual cost — no PPV JLR exists in STAT_SLAM.</p></div></div><div class="config-step"><div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Item Cost Profiles</h4><p>Assign items to the correct cost book via Cost Profile. Items manufactured in primary at standard; same items costed in secondary at actual accumulated cost. Both flow from the same inventory transaction.</p></div></div></div></div>
+    <div id="3-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Inventory Valuation — Dual Book Rules</span></div><div class="sla-rule-body"><ul><li>Event Class: Inventory Transactions</li><li>JLR: Inventory Valuation — Primary. ADR derives standard cost account from CORP_BOOK mapping set</li><li>JLR: Inventory Valuation — Secondary. ADR derives actual cost account from STAT_BOOK mapping set</li><li>Condition: Cost Book attribute routes each JLR to the correct ledger SLAM</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">PPV — Primary Only</span></div><div class="sla-rule-body"><ul><li>JLR for PPV applicable only to CORP_BOOK (standard cost book). Condition: Cost Book = CORP_BOOK</li><li>No PPV entry in secondary — actual cost absorbs actuals directly. No variance account needed</li><li>This is the most important design distinction: PPV is a standard-cost artefact that does not exist under actual costing</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">WIP Valuation</span></div><div class="sla-rule-body"><ul><li>Primary SLAM: WIP at standard. Variance accounts capture efficiency and rate variances</li><li>Secondary SLAM: WIP at actual accumulated cost. No variance accounts — actual costs flow through directly</li><li>Separate WIP JLRs per SLAM with Cost Book condition to ensure correct routing</li></ul></div></div></div>
+    <div id="3-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Material receipt — standard cost 100, actual cost 112</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (Corp)</span></td><td><span class="entry-acct">1300 Inventory</span></td><td class="entry-dr">Dr 100</td><td>Standard cost</td></tr><tr><td><span class="entry-ledger el-primary">Primary (Corp)</span></td><td><span class="entry-acct">2100 AP Clearing</span></td><td class="entry-cr">Cr 112</td><td>Invoice amount</td></tr><tr><td><span class="entry-ledger el-primary">Primary (Corp)</span></td><td><span class="entry-acct">5100 PPV</span></td><td class="entry-dr">Dr 12</td><td>Price variance (unfav)</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">1310 Inventory (Actual)</span></td><td class="entry-dr">Dr 112</td><td>Actual cost — no PPV</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">2100 AP Clearing</span></td><td class="entry-cr">Cr 112</td><td>Invoice amount (same)</td></tr></tbody></table></div>
+    <div id="3-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">−60%</span><span class="kpi-label">Inventory valuation reconciliation time between ledgers</span></div><div class="kpi-card"><span class="kpi-value">+90%</span><span class="kpi-label">PPV tracking and reporting accuracy vs manual process</span></div><div class="kpi-card"><span class="kpi-value">100%</span><span class="kpi-label">Statutory inventory compliance rate</span></div><div class="kpi-card"><span class="kpi-value">−95%</span><span class="kpi-label">Manual WIP adjustment journals per period</span></div><div class="kpi-card"><span class="kpi-value">&lt;5</span><span class="kpi-label">Inter-ledger cost reconciliation exceptions per period</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 4 -->
+<div id="panel-4" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 04 of 13</span></div>
+    <div class="uc-title">AP/AR — Prepayments, Deferred Revenue<br>&amp; Withholding Tax (Local Statutory)</div>
+    <div class="uc-badges"><span class="badge badge-blue">Costing</span><span class="badge badge-blue">AP / AR</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(4,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(4,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(4,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(4,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(4,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="4-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>AP and AR transactions must be accounted differently in the secondary ledger to reflect local statutory treatment — prepayment recognition, deferred revenue timing, and withholding tax accounts that differ from IFRS treatment in the primary ledger. Subscription revenue recognised on delivery locally vs IFRS 15 performance obligations.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>AP/AR secondary ledger differences required manual journal entries every period. Withholding tax differences often were not reconciled at all — discovered only at year-end audit or tax filing.</p></div></div></div>
+    <div id="4-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure AP Invoice Options — Secondary</h4><p>In secondary ledger AP configuration, define prepayment accounts specific to local statutory requirements. Map prepayment asset account to local stat account 3100 (vs IFRS account 1200).</p><span class="step-nav">Payables › Manage Payables Options</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure AR Transaction Types — Secondary</h4><p>Define transaction type mapping for deferred revenue scenarios. SUBSCRIPTION transaction type triggers deferred revenue treatment in secondary; IFRS 15 performance obligation treatment in primary.</p><span class="step-nav">Receivables › Manage Transaction Types</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Withholding Tax — Secondary</h4><p>Define WHT tax codes for secondary ledger with local statutory account codes. Supplier classification (WITHHOLDING_ELIGIBLE) drives WHT JLR condition in SLA.</p><span class="step-nav">Tax › Manage Tax Codes</span></div></div></div></div>
+    <div id="4-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">AP Prepayment Rules — Secondary</span></div><div class="sla-rule-body"><ul><li>Event Class: Prepayments. Event Type: Prepayment Applied</li><li>JLR: Prepayment Expense — Secondary. Condition: Ledger = Secondary. ADR: local stat prepayment expense account</li><li>Priority: Secondary-specific rules must have higher priority than default rules when Ledger = Secondary</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">AR Deferred Revenue Rules — Secondary</span></div><div class="sla-rule-body"><ul><li>JLR: Deferred Revenue — Secondary. Condition: Ledger = Secondary AND Transaction Type = SUBSCRIPTION</li><li>ADR: secondary deferred revenue account (2500 local stat) instead of revenue (4000 IFRS)</li><li>JLR: Revenue Release — Secondary. Triggered on receipt or delivery milestone event</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-cond">CONDITION</span><span class="sla-rule-name">Withholding Tax — Secondary</span></div><div class="sla-rule-body"><ul><li>Condition: Supplier Type = WITHHOLDING_ELIGIBLE AND Ledger = Secondary</li><li>JLR for WHT liability using local stat account code, distinct from primary WHT account</li><li>No WHT entry in primary ledger for same transaction (IFRS treatment differs)</li></ul></div></div></div>
+    <div id="4-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Subscription revenue receipt — IFRS 15 deferred vs local immediate</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">1000 AR</span></td><td class="entry-dr">Dr 12,000</td><td>Annual subscription invoice</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">2500 Deferred Revenue</span></td><td class="entry-cr">Cr 12,000</td><td>Recognised over 12 months</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">1000 AR</span></td><td class="entry-dr">Dr 12,000</td><td>Same invoice</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">4000 Revenue</span></td><td class="entry-cr">Cr 12,000</td><td>Recognised on receipt (local stat)</td></tr></tbody></table></div>
+    <div id="4-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">&lt;0.5%</span><span class="kpi-label">AP/AR secondary ledger posting error rate</span></div><div class="kpi-card"><span class="kpi-value">−50%</span><span class="kpi-label">Prepayment reconciliation time per period</span></div><div class="kpi-card"><span class="kpi-value">&gt;99%</span><span class="kpi-label">Deferred revenue balance accuracy</span></div><div class="kpi-card"><span class="kpi-value">−40%</span><span class="kpi-label">SLA rule maintenance effort per period</span></div><div class="kpi-card"><span class="kpi-value">Zero</span><span class="kpi-label">Audit queries on unexplained AP/AR inter-ledger differences</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 5 -->
+<div id="panel-5" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 05 of 13</span></div>
+    <div class="uc-title">Project Revenue Recognition<br>IFRS 15 (Primary) vs Local GAAP POC (Secondary)</div>
+    <div class="uc-badges"><span class="badge badge-blue">Costing</span><span class="badge badge-blue">Projects</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(5,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(5,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(5,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(5,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(5,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="5-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>A professional services firm recognises project revenue under IFRS 15 performance obligation framework in the primary ledger. Local statutory reporting requires percentage-of-completion (POC) method. Development costs are capitalised as intangible assets under IAS 38 in primary but expensed immediately under local GAAP in the secondary ledger.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>Projects integration to secondary ledger for unbilled receivables and deferred revenue was not automated. Finance teams maintained parallel project tracking in spreadsheets. Reconciliation to GL was never fully clean.</p></div></div></div>
+    <div id="5-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Project Type for Dual Recognition</h4><p>Set PROJECT_TYPE attribute on IFRS 15 contracts. This attribute is used as SLA condition to route revenue recognition differently between primary and secondary ledger SLAMs.</p><span class="step-nav">Projects › Manage Project Types</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Define Revenue Method for Secondary (POC)</h4><p>Assign LOCAL_GAAP_POC revenue method to secondary ledger project profile. Revenue recognised based on completion percentage rather than performance obligation satisfaction.</p><span class="step-nav">Projects › Manage Revenue Methods</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div><div class="step-body"><h4>Unbilled Receivables — Schedule Manual Review</h4><p>IFRS 15 and local GAAP POC unbilled AR accounts diverge. Schedule manual reconciliation review for first three periods post go-live. Build a dedicated reconciliation report for ongoing monitoring.</p></div></div></div></div>
+    <div id="5-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Revenue Recognition Rules</span></div><div class="sla-rule-body"><ul><li>Primary SLAM: IFRS 15 performance obligation satisfaction drives revenue recognition timing</li><li>Secondary SLAM: Condition on Revenue Method = LOCAL_GAAP_POC. ADR: derive local stat revenue account</li><li>Use PROJECT_TYPE attribute as condition to apply rules only to project-type contracts</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Development Cost — Capitalise vs Expense</span></div><div class="sla-rule-body"><ul><li>Primary: Condition on Expenditure Type = DEVELOPMENT → Capitalise to Intangible Asset (IAS 38)</li><li>Secondary: Same condition → route to Development Expense (local GAAP expenses development costs)</li><li>ADR condition: Expenditure Type = DEVELOPMENT AND Ledger = Secondary → Expense Account 6800</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-adr">ADR</span><span class="sla-rule-name">Unbilled Receivables Account</span></div><div class="sla-rule-body"><ul><li>Primary: Unbilled AR account 1250 (IFRS)</li><li>Secondary: Unbilled AR account 3300 (local stat). ADR conditioned on Ledger = Secondary</li><li>Both accounts need to be reconciled — close monitor threshold set tighter for this use case</li></ul></div></div></div>
+    <div id="5-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Month-end revenue — IFRS 15 milestone vs local POC (60% complete, 1M contract)</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">1250 Unbilled AR</span></td><td class="entry-dr">Dr 0</td><td>No milestone reached this month</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">4000 Revenue</span></td><td class="entry-cr">Cr 0</td><td>No performance obligation met</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">3300 Unbilled AR</span></td><td class="entry-dr">Dr 50,000</td><td>POC: 60% → 65% = 5% of 1M</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">4100 Project Revenue</span></td><td class="entry-cr">Cr 50,000</td><td>Local GAAP completion-based</td></tr></tbody></table></div>
+    <div id="5-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">&gt;98%</span><span class="kpi-label">Revenue recognition accuracy — secondary vs primary variance 100% policy-explainable</span></div><div class="kpi-card"><span class="kpi-value">−20%</span><span class="kpi-label">Project financial close cycle time</span></div><div class="kpi-card"><span class="kpi-value">−70%</span><span class="kpi-label">Manual project adjustment journals to secondary ledger</span></div><div class="kpi-card"><span class="kpi-value">−40%</span><span class="kpi-label">Unbilled receivables reconciliation time</span></div><div class="kpi-card"><span class="kpi-value">100%</span><span class="kpi-label">Development cost capitalisation audit compliance</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 6 -->
+<div id="panel-6" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 06 of 13</span></div>
+    <div class="uc-title">Intercompany Elimination (Primary)<br>vs Retention (Secondary / Statutory)</div>
+    <div class="uc-badges"><span class="badge badge-gold">Group</span><span class="badge badge-blue">GL / AP / AR</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(6,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(6,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(6,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(6,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(6,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="6-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>A multinational group must eliminate intercompany balances at the consolidated group level (primary ledger — IFRS group accounts). The statutory secondary ledger must retain those same IC balances as genuine trading balances — the local statutory entity is required to show its full IC receivables and payables on its statutory balance sheet.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>IC eliminations in the primary conflicted with statutory retention requirements. Many implementations ran IC eliminations entirely outside Fusion in Hyperion/FCCS, with manual feeds back to statutory reporting. Reconciliation exceptions were numerous and audit-intensive.</p></div></div></div>
+    <div id="6-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Intercompany Balancing — Primary</h4><p>Set up IC elimination accounts in primary ledger CoA (IC Receivable Elimination 1990, IC Revenue Elimination 4990). These elimination accounts are used only in primary SLAM JLRs, never in secondary.</p></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure IC Retention — Secondary</h4><p>Secondary ledger retains full IC balances using standard AR/AP accounts (1850 IC Receivable, 5900 IC Revenue). No elimination JLR fires for secondary — IC transactions pass through at full value.</p></div></div><div class="config-step"><div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div><div class="step-body"><h4>Set IC Balance Mismatch Threshold</h4><p>Configure Close Monitor IC reconciliation threshold at &lt;0.5%. Any IC balance mismatch between entities must be resolved before close. Target: all IC exceptions are policy-explainable.</p><span class="step-nav">GL › Period Close › Close Monitor</span></div></div></div></div>
+    <div id="6-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">IC Elimination Rules — Primary Only</span></div><div class="sla-rule-body"><ul><li>Event Class: Intercompany. Event Type: IC Invoice / IC Journal</li><li>JLR: IC Elimination — Primary. Condition: Ledger = Primary AND IC Transaction Type IN (TRADING, LOAN, MGMT_CHARGE)</li><li>ADR: derive elimination account (IC Receivable Elimination 1990, IC Revenue Elimination 4990)</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">IC Retention Rules — Secondary</span></div><div class="sla-rule-body"><ul><li>JLR: IC Receivable — Secondary. Condition: Ledger = Secondary. ADR: retain full IC receivable account (1850 local stat)</li><li>JLR: IC Revenue — Secondary. ADR: retain IC revenue account (5900 local stat) — no elimination</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">IC Loan Interest</span></div><div class="sla-rule-body"><ul><li>Primary: eliminate IC interest income/expense (offset accounts)</li><li>Secondary: retain both IC interest income (entity A) and IC interest expense (entity B) — both appear on statutory P&amp;L</li><li>Separate JLRs with Ledger condition for each treatment</li></ul></div></div></div>
+    <div id="6-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: IC trading sale — Entity A sells to Entity B, 500,000</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Treatment</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (Group)</span></td><td><span class="entry-acct">1990 IC Recv Elim</span></td><td class="entry-dr">Dr 500,000</td><td>Eliminate IC receivable</td></tr><tr><td><span class="entry-ledger el-primary">Primary (Group)</span></td><td><span class="entry-acct">4990 IC Rev Elim</span></td><td class="entry-cr">Cr 500,000</td><td>Eliminate IC revenue</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">1850 IC Receivable</span></td><td class="entry-dr">Dr 500,000</td><td>Retain — statutory balance sheet</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">5900 IC Revenue</span></td><td class="entry-cr">Cr 500,000</td><td>Retain — statutory P&amp;L</td></tr></tbody></table></div>
+    <div id="6-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">−75%</span><span class="kpi-label">IC reconciliation exceptions per period vs manual elimination</span></div><div class="kpi-card"><span class="kpi-value">−35%</span><span class="kpi-label">Consolidation preparation time</span></div><div class="kpi-card"><span class="kpi-value">−90%</span><span class="kpi-label">Manual IC elimination journal entries — automated via SLA</span></div><div class="kpi-card"><span class="kpi-value">−60%</span><span class="kpi-label">Audit findings related to IC eliminations</span></div><div class="kpi-card"><span class="kpi-value">&lt;0.5%</span><span class="kpi-label">IC balance mismatch rate at period-end</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 7 -->
+<div id="panel-7" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 07 of 13</span></div>
+    <div class="uc-title">IFRS 16 Right-of-Use Asset (Primary)<br>vs Operating Lease Expense (Secondary / Local GAAP)</div>
+    <div class="uc-badges"><span class="badge badge-oracle">Statutory</span><span class="badge badge-blue">Fixed Assets</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(7,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(7,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(7,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(7,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(7,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="7-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>IFRS 16 requires recognition of a Right-of-Use (ROU) asset and lease liability for virtually all leases in the primary ledger. Local statutory GAAP has not adopted IFRS 16 — leases are still classified as operating leases with straight-line rental expense. The same lease payment must produce ROU/liability accounting in primary and straight-line rental expense in secondary.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>IFRS 16 and operating lease accounting required entirely separate manual journal processes. Many implementations ran IFRS 16 in a completely separate Oracle Lease Management module with no automated feed to the secondary statutory ledger. Month-end reconciliation of ROU values to local stat balance sheet was entirely manual.</p></div></div></div>
+    <div id="7-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Lease Accounting — Primary (IFRS 16)</h4><p>Oracle Lease Management module assigned to primary ledger. ROU asset recognised at commencement. Lease liability amortised using effective interest method. All standard IFRS 16 journal classes fire in primary SLAM only.</p><span class="step-nav">Fixed Assets › Leases › Manage Leases</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Secondary Ledger for Operating Lease</h4><p>Secondary SLAM suppresses ROU and liability entries via Null JLR. Separate JLR produces straight-line rental expense from payment schedule. Amount derivation: total lease payments ÷ lease term (months).</p></div></div></div></div>
+    <div id="7-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Suppress ROU / Liability in Secondary</span></div><div class="sla-rule-body"><ul><li>Event Class: Lease Commencement. Event Type: Initial Recognition</li><li>Create a Null JLR for secondary: when Ledger = Secondary AND Event Type = Initial_Recognition → produce no journal</li><li>This prevents ROU Asset debit and Lease Liability credit from appearing in the secondary ledger</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Straight-Line Rental Expense (Secondary)</span></div><div class="sla-rule-body"><ul><li>Event Class: Lease Payment. Event Type: Periodic Payment</li><li>JLR: Lease Rental Expense — Secondary. Condition: Ledger = Secondary. ADR: Lease Rental Expense 7300</li><li>Amount derivation: straight-line amount (total lease payments ÷ lease term), not the IFRS 16 split of principal + interest</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Lease Modification</span></div><div class="sla-rule-body"><ul><li>Primary: remeasure ROU asset and liability per IFRS 16</li><li>Secondary: recalculate straight-line rental and adjust prospectively</li><li>Create JLR for Lease Modification events with separate primary and secondary treatment and Ledger condition</li></ul></div></div></div>
+    <div id="7-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Monthly lease payment — 5yr lease, 12,000/month payment, IFRS 16 vs operating</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (IFRS 16)</span></td><td><span class="entry-acct">3100 Lease Liability</span></td><td class="entry-dr">Dr 10,500</td><td>Principal repayment</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS 16)</span></td><td><span class="entry-acct">7400 Interest Expense</span></td><td class="entry-dr">Dr 1,500</td><td>Effective interest on liability</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS 16)</span></td><td><span class="entry-acct">1050 Cash / AP</span></td><td class="entry-cr">Cr 12,000</td><td>Actual payment</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">7300 Rental Expense</span></td><td class="entry-dr">Dr 12,000</td><td>Straight-line operating lease</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">1050 Cash / AP</span></td><td class="entry-cr">Cr 12,000</td><td>Same cash payment</td></tr></tbody></table></div>
+    <div id="7-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">~100%</span><span class="kpi-label">Manual lease journal entries eliminated</span></div><div class="kpi-card"><span class="kpi-value">100%</span><span class="kpi-label">Lease compliance rate — IFRS 16 in primary, operating in secondary</span></div><div class="kpi-card"><span class="kpi-value">−100%</span><span class="kpi-label">Lease reclassification errors — automated suppression</span></div><div class="kpi-card"><span class="kpi-value">−50%</span><span class="kpi-label">Lease sub-ledger close time per period</span></div><div class="kpi-card"><span class="kpi-value">Zero</span><span class="kpi-label">Audit findings on ROU/Liability recognition in secondary ledger</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 8 -->
+<div id="panel-8" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 08 of 13</span></div>
+    <div class="uc-title">Tax Ledger — Accelerated Depreciation<br>&amp; Deferred Tax Calculation Support</div>
+    <div class="uc-badges"><span class="badge badge-oracle">Statutory</span><span class="badge badge-blue">Fixed Assets</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(8,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(8,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(8,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(8,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(8,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="8-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>A company requires a dedicated tax book as a secondary ledger to maintain tax-basis asset values and track temporary differences for deferred tax calculation. Primary ledger carries accounting depreciation (straight-line per IFRS). Tax ledger carries accelerated tax depreciation (declining balance per tax code). The difference creates deferred tax liabilities/assets that must be calculated accurately each period.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>Tax asset book reconciliation to GL was entirely manual. Deferred tax workpapers were built in Excel from FA register data — not from GL balances. Tax provision accuracy was poor and audit-intensive.</p></div></div></div>
+    <div id="8-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Create TAX_BOOK Asset Book</h4><p>Create tax FA book assigned to secondary ledger. Configure accelerated depreciation methods (declining balance, bonus depreciation) per asset category and jurisdiction. Assign TAX_SLAM.</p><span class="step-nav">Fixed Assets › Asset Books › Create</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Deferred Tax Memo Entries</h4><p>Create JLRs to book the temporary difference as memo entries in the tax ledger. Deferred Tax Liability when tax depreciation exceeds accounting. Deferred Tax Asset when accounting expense exceeds tax-deductible amount (e.g., warranty provisions).</p></div></div></div></div>
+    <div id="8-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Tax Depreciation Expense — Secondary</span></div><div class="sla-rule-body"><ul><li>Event Class: Asset Transactions. Event Type: Depreciation</li><li>JLR: Tax Depreciation Expense — Secondary. ADR: Tax Depreciation Expense account 7500 (tax ledger)</li><li>Amount derivation: use tax book depreciation amount (accelerated), not accounting amount from primary</li><li>Condition: Book = TAX_BOOK ensures rules fire only in secondary</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Temporary Difference — Deferred Tax</span></div><div class="sla-rule-body"><ul><li>Create JLRs to book the temporary difference as a memo entry in the tax ledger</li><li>Deferred Tax Liability: when tax depreciation &gt; accounting depreciation. Credit DTL account in secondary</li><li>Deferred Tax Asset: when accounting expense &gt; tax-deductible amount. Debit DTA account in secondary</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-adr">ADR</span><span class="sla-rule-name">Tax-Basis Asset Values</span></div><div class="sla-rule-body"><ul><li>Tax ledger maintains tax net book value (cost less accumulated tax depreciation) as actual GL balances</li><li>This provides the tax base of each asset class directly from GL — no manual lookup required</li><li>Tax provision team reads deferred tax directly from secondary ledger balances</li></ul></div></div></div>
+    <div id="8-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Annual depreciation — asset cost 500,000, IFRS SL 10yr vs tax DB 25%</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">7100 Depr Expense</span></td><td class="entry-dr">Dr 50,000</td><td>Straight-line, 10yr</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS)</span></td><td><span class="entry-acct">0200 Accum Depr</span></td><td class="entry-cr">Cr 50,000</td><td>Accounting NBV</td></tr><tr><td><span class="entry-ledger el-secondary">Tax Ledger</span></td><td><span class="entry-acct">7500 Tax Depr</span></td><td class="entry-dr">Dr 125,000</td><td>Declining balance 25% (yr1)</td></tr><tr><td><span class="entry-ledger el-secondary">Tax Ledger</span></td><td><span class="entry-acct">0210 Tax Accum Depr</span></td><td class="entry-cr">Cr 125,000</td><td>Tax NBV = 375,000</td></tr><tr><td><span class="entry-ledger el-secondary">Tax Ledger</span></td><td><span class="entry-acct">6900 DTL Expense</span></td><td class="entry-dr">Dr 18,750</td><td>Temp diff 75,000 × 25% tax rate</td></tr><tr><td><span class="entry-ledger el-secondary">Tax Ledger</span></td><td><span class="entry-acct">3800 DTL Liability</span></td><td class="entry-cr">Cr 18,750</td><td>Deferred tax liability</td></tr></tbody></table></div>
+    <div id="8-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">−40%</span><span class="kpi-label">Deferred tax calculation cycle time</span></div><div class="kpi-card"><span class="kpi-value">+15%</span><span class="kpi-label">Tax provision accuracy — variance to final return</span></div><div class="kpi-card"><span class="kpi-value">−50%</span><span class="kpi-label">Audit adjustments related to deferred tax</span></div><div class="kpi-card"><span class="kpi-value">−30%</span><span class="kpi-label">Tax close cycle time post period-end</span></div><div class="kpi-card"><span class="kpi-value">&gt;80%</span><span class="kpi-label">Manual tax workpaper inputs replaced by GL data from secondary ledger</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 9 -->
+<div id="panel-9" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 09 of 13</span></div>
+    <div class="uc-title">Hyperinflationary Economy<br>IAS 29 Restatement (Primary) vs Historical Cost (Secondary)</div>
+    <div class="uc-badges"><span class="badge badge-oracle">Statutory</span><span class="badge badge-blue">GL</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(9,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(9,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(9,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(9,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(9,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="9-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>An entity operating in a hyperinflationary economy (Argentina, Turkey, Zimbabwe) must restate its financial statements in current purchasing power units under IAS 29 in the primary ledger. The secondary ledger maintains historical cost accounting as required by local statutory reporting — restatement entries must not appear in the statutory book.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>IAS 29 restatement was handled entirely outside the GL in most implementations. Finance teams ran restatement calculations in spreadsheets and posted massive manual journals. Comparative period restatement was a multi-week manual exercise.</p></div></div><div class="callout c-warn"><span class="callout-icon">⚠</span><div class="callout-inner"><span class="callout-label">Critical Pitfall</span><p>Teams sometimes incorrectly run the IAS 29 restatement process against both primary and secondary ledger. The secondary (historical cost) ledger must never receive restatement entries. Use Ledger = Primary condition on all IAS 29 JLRs explicitly.</p></div></div></div>
+    <div id="9-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Enable IAS 29 Processing — Primary Only</h4><p>Configure IAS 29 restatement in the primary ledger's period close workflow. Secondary ledger has no IAS 29 configuration. Restatement process must be explicitly prevented from running against secondary period.</p></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Purchasing Power Gain/Loss Accounts</h4><p>Primary CoA: PPG account 4980 (gain), PPL account 7980 (loss). These accounts do not exist in secondary CoA mapping — secondary retains original monetary and non-monetary balances at historical rates.</p></div></div></div></div>
+    <div id="9-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">IAS 29 Restatement Entries — Primary Only</span></div><div class="sla-rule-body"><ul><li>Event Class: Period-End Restatement. Event Type: IAS29_Restatement</li><li>JLR: IAS 29 Restatement Adjustment — Primary. Condition: Ledger = Primary AND Event Type = IAS29_Restatement</li><li>No corresponding JLR for secondary — restatement entries must not flow to historical cost ledger</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Purchasing Power Gain/Loss — Primary Only</span></div><div class="sla-rule-body"><ul><li>JLR: PPG/L Recognition — Primary. Event Type: Monetary_Position_Gain_Loss</li><li>ADR: derive PPG account 4980 (gain) or PPL account 7980 (loss) in primary</li><li>Condition: Ledger = Primary explicitly. Secondary ledger has no PPG/L entry — not applicable under historical cost</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Asset Restated Values — Primary FA Only</span></div><div class="sla-rule-body"><ul><li>Fixed asset restatement entries (restated cost, restated accumulated depreciation) flow only to primary via separate FA JLRs</li><li>Secondary retains original cost and original accumulated depreciation per local statutory requirement</li></ul></div></div></div>
+    <div id="9-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Year-end IAS 29 restatement — 40% cumulative inflation index adjustment</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (IAS 29)</span></td><td><span class="entry-acct">0100 PP&amp;E (Restated)</span></td><td class="entry-dr">Dr 200,000</td><td>Restatement uplift at CPI index</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IAS 29)</span></td><td><span class="entry-acct">3500 Restatement Reserve</span></td><td class="entry-cr">Cr 200,000</td><td>Equity restatement reserve</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IAS 29)</span></td><td><span class="entry-acct">4980 PPG</span></td><td class="entry-cr">Cr 85,000</td><td>Purchasing power gain on liabilities</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IAS 29)</span></td><td><span class="entry-acct">8000 Monetary Position</span></td><td class="entry-dr">Dr 85,000</td><td>Net monetary position offset</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Historical)</span></td><td colspan="3" style="color:var(--ink4);font-style:italic">No entries — historical cost retained as-is</td></tr></tbody></table></div>
+    <div id="9-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">−90%</span><span class="kpi-label">IAS 29 restatement errors per period</span></div><div class="kpi-card"><span class="kpi-value">−60%</span><span class="kpi-label">Restatement cycle time — from period-end to restated financials available</span></div><div class="kpi-card"><span class="kpi-value">−80%</span><span class="kpi-label">Manual restatement journal volume</span></div><div class="kpi-card"><span class="kpi-value">+25%</span><span class="kpi-label">Comparative period restatement accuracy vs manual process</span></div><div class="kpi-card"><span class="kpi-value">−70%</span><span class="kpi-label">Auditor queries on restatement methodology</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 10 -->
+<div id="panel-10" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 10 of 13</span></div>
+    <div class="uc-title">Joint Venture Accounting<br>Working Interest Net (Primary) vs Gross (Secondary)</div>
+    <div class="uc-badges"><span class="badge badge-gold">Group</span><span class="badge badge-blue">Projects / GL</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(10,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(10,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(10,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(10,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(10,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="10-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>An oil &amp; gas or mining operator manages joint venture (JV) interests. The primary ledger records the entity's net working interest share (e.g., 40% WI) per IFRS. The secondary ledger records gross 100% costs and revenues for PSA government reporting and partner billing. Partner receivables for their WI share are generated from secondary ledger data.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>Gross JV accounting required entirely separate modules or manual gross-up calculations. Partner billing was generated from spreadsheets derived from sub-ledger data, not from the GL. PSA government reporting compliance was difficult to audit.</p></div></div></div>
+    <div id="10-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure JV Project Attributes</h4><p>Define JV_OPERATED project type. Set working interest % at project level. Cost distribution rules derive WI% automatically for primary ledger entries. Full cost flows to secondary via Gross Cost JLR.</p><span class="step-nav">Projects › Manage Project Types</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Secondary Ledger CoA for Gross Reporting</h4><p>Secondary CoA includes gross JV cost accounts (separate from WI net accounts in primary). Partner billing module reads secondary ledger gross balances to generate cash calls and billing statements.</p></div></div></div></div>
+    <div id="10-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Working Interest Split Rules</span></div><div class="sla-rule-body"><ul><li>Event Class: Cost Distribution. Condition: Project Type = JV_OPERATED</li><li>JLR: WI Cost — Primary. Amount: cost × working interest %. ADR: operator cost account in primary CoA</li><li>JLR: Gross Cost — Secondary. Amount: 100% full cost. ADR: gross JV cost account in secondary CoA</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Revenue Split</span></div><div class="sla-rule-body"><ul><li>JLR: WI Revenue — Primary. Amount: revenue × working interest %. ADR: operator revenue account</li><li>JLR: Gross Revenue — Secondary. Amount: 100% gross production revenue. ADR: gross JV revenue account</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Capital Expenditure (AFE)</span></div><div class="sla-rule-body"><ul><li>AFE (Authority for Expenditure) amounts recorded gross in secondary — 100% of joint operation capital</li><li>Primary records net (WI%) capital via standard FA integration</li><li>Partner receivables for their share generated from secondary ledger AFE data via partner billing</li></ul></div></div></div>
+    <div id="10-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Drilling cost 1,000,000 — operator 40% WI, partners 60% WI</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (WI Net)</span></td><td><span class="entry-acct">0500 Drilling Costs</span></td><td class="entry-dr">Dr 400,000</td><td>40% working interest share</td></tr><tr><td><span class="entry-ledger el-primary">Primary (WI Net)</span></td><td><span class="entry-acct">2000 AP / Accrual</span></td><td class="entry-cr">Cr 400,000</td><td>Operator's liability only</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Gross)</span></td><td><span class="entry-acct">0510 Gross Drilling</span></td><td class="entry-dr">Dr 1,000,000</td><td>100% JV cost for PSA reporting</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Gross)</span></td><td><span class="entry-acct">1800 Partner Recv</span></td><td class="entry-cr">Cr 600,000</td><td>Partners' 60% share receivable</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Gross)</span></td><td><span class="entry-acct">2000 AP / Accrual</span></td><td class="entry-cr">Cr 400,000</td><td>Operator's own liability</td></tr></tbody></table></div>
+    <div id="10-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">−85%</span><span class="kpi-label">Gross-up manual effort eliminated</span></div><div class="kpi-card"><span class="kpi-value">−50%</span><span class="kpi-label">JV audit findings on gross vs net reconciliation</span></div><div class="kpi-card"><span class="kpi-value">−40%</span><span class="kpi-label">Operator reporting cycle time (AFE and cash call billing)</span></div><div class="kpi-card"><span class="kpi-value">−60%</span><span class="kpi-label">IC / partner reconciliation exceptions</span></div><div class="kpi-card"><span class="kpi-value">100%</span><span class="kpi-label">PSA government reporting compliance rate</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 11 -->
+<div id="panel-11" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 11 of 13</span></div>
+    <div class="uc-title">IFRS 9 Financial Instruments<br>ECL &amp; Fair Value (Primary) vs Incurred Loss (Secondary)</div>
+    <div class="uc-badges"><span class="badge badge-purple">Instruments</span><span class="badge badge-blue">AR / GL</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(11,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(11,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(11,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(11,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(11,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="11-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>A financial institution or corporate treasury applies IFRS 9 in the primary ledger: Expected Credit Loss provisioning, Fair Value Through P&amp;L (FVTPL), and Fair Value Through OCI (FVOCI) classifications. The secondary ledger applies local statutory rules: incurred loss provisioning (no forward-looking ECL), instruments at amortised cost (no fair value adjustments).</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>IFRS 9 accounting was largely manual — ECL calculations in Excel, fair value journals posted manually. Reconciliation to statutory incurred loss provisions was an entirely separate workpaper process. Regulatory reporting was at high risk of error.</p></div></div></div>
+    <div id="11-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure IFRS 9 Classification in Primary</h4><p>Set instrument Classification attribute (FVTPL, FVOCI, AMORTISED_COST) at instrument or portfolio level. This attribute is used as SLA condition to route fair value and ECL entries correctly to primary only.</p></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Incurred Loss Provisioning — Secondary</h4><p>Secondary ledger uses specific provision accounts (Specific Provision 2800, Provision Expense 6800). ECL allowance accounts (1900, 6900) exist only in primary CoA or are mapped to zero-balance accounts in secondary CoA mapping.</p></div></div></div></div>
+    <div id="11-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">ECL vs Incurred Loss Provisioning</span></div><div class="sla-rule-body"><ul><li>Event Class: Credit Loss. Event Type: Provision Creation</li><li>JLR: ECL Provision — Primary. Condition: Ledger = Primary. ADR: ECL Allowance 1900, ECL Expense 6900</li><li>JLR: Incurred Loss Provision — Secondary. Condition: Ledger = Secondary. ADR: Specific Provision 2800, Provision Expense 6800</li><li>Amount may differ significantly between ledgers in early-stage provisioning — this difference is expected and must be explained in recon</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Fair Value Adjustments — FVTPL</span></div><div class="sla-rule-body"><ul><li>Event Class: Revaluation. Condition: Classification = FVTPL AND Ledger = Primary</li><li>JLR: FV Gain/Loss — Primary. ADR: FV through P&amp;L account 4500 (gain) / 7500 (loss)</li><li>No corresponding entry in secondary — instrument carried at amortised cost in statutory ledger</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">FVOCI Instruments</span></div><div class="sla-rule-body"><ul><li>Primary: FV change to OCI reserve (3900). Recycled to P&amp;L on disposal</li><li>Secondary: no FV adjustment. Instrument carried at amortised cost. Dispose at cost with simple gain/loss</li><li>Separate OCI JLR with Ledger = Primary condition ensures OCI entries never appear in statutory book</li></ul></div></div></div>
+    <div id="11-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Credit loss provision — IFRS 9 ECL 150k vs local incurred loss 40k</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (IFRS 9)</span></td><td><span class="entry-acct">6900 ECL Expense</span></td><td class="entry-dr">Dr 150,000</td><td>12-month ECL on loan portfolio</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IFRS 9)</span></td><td><span class="entry-acct">1900 ECL Allowance</span></td><td class="entry-cr">Cr 150,000</td><td>Forward-looking expected loss</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">6800 Provision Expense</span></td><td class="entry-dr">Dr 40,000</td><td>Incurred loss — specific debtor</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">2800 Specific Provision</span></td><td class="entry-cr">Cr 40,000</td><td>Local regulatory provision</td></tr></tbody></table></div>
+    <div id="11-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">−55%</span><span class="kpi-label">Credit provision reconciliation time — IFRS 9 vs local statutory</span></div><div class="kpi-card"><span class="kpi-value">−70%</span><span class="kpi-label">Fair value adjustment posting errors</span></div><div class="kpi-card"><span class="kpi-value">+20%</span><span class="kpi-label">Regulatory reporting accuracy — secondary ledger basis</span></div><div class="kpi-card"><span class="kpi-value">−65%</span><span class="kpi-label">Audit findings on instrument classification</span></div><div class="kpi-card"><span class="kpi-value">−90%</span><span class="kpi-label">Manual fair value adjustment journals — automated via treasury integration</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 12 -->
+<div id="panel-12" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 12 of 13</span></div>
+    <div class="uc-title">Pre-Consolidation Staging<br>Adjustment-Only Secondary Ledger</div>
+    <div class="uc-badges"><span class="badge badge-gold">Group</span><span class="badge badge-blue">GL (Adj Only)</span><span class="badge badge-teal">Adjustment-Only Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(12,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(12,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(12,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(12,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(12,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="12-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>A group finance team needs to stage pre-consolidation adjustments — goodwill amortisation (required under local GAAP but prohibited under IFRS), acquisition accounting fair value adjustments, intercompany mark-ups in inventory. These adjustments must be applied before data loads into FCCS or HFM, and must not contaminate the statutory primary ledger.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>Pre-consolidation adjustments were managed entirely outside Fusion — in consolidation tools or spreadsheets. No systematic way to maintain them in the GL, test them against actuals, or carry them forward between periods automatically.</p></div></div><div class="callout c-warn"><span class="callout-icon">⚠</span><div class="callout-inner"><span class="callout-label">Critical Pitfall</span><p>For this use case, the adjustment-only ledger must be closed before the FCCS/HFM data load. Leaving it open means unapproved adjustment entries can be added after the data load, invalidating group consolidation figures.</p></div></div></div>
+    <div id="12-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Create Adjustment-Only Secondary Ledger</h4><p>Set conversion level to <strong>Adjustment Only</strong> — this ledger receives no subledger accounting at all. All entries are manual journal entries or FA-driven. This is the key configuration distinction from all other secondary ledger use cases.</p><span class="step-nav">Setup &amp; Maintenance › Manage Accounting Configurations</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Journal Approval Rules</h4><p>Create Journal Approval Rules for the adjustment ledger. All manual entries must be reviewed by the Group Finance controller. No unapproved journals may post. Configure auto-reversal for entries that reverse in the following period.</p><span class="step-nav">GL › Manage Journal Approval Rules</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">3</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure FA for Goodwill Amortisation</h4><p>Assign goodwill asset book to the adjustment ledger. FA depreciation run generates goodwill amortisation entries automatically: Dr Goodwill Amortisation Expense / Cr Accumulated Amortisation. Primary ledger receives no amortisation (IFRS — impairment only).</p></div></div></div></div>
+    <div id="12-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Notes</div><div class="callout c-info"><span class="callout-icon">ℹ</span><div class="callout-inner"><span class="callout-label">Conversion Level = Adjustment Only</span><p>Since conversion level is Adjustment Only, no subledger accounting flows in. SLA rules are not required for subledger-driven entries — there are none. However, configure Journal Approval Rules for the adjustment ledger to ensure all manual entries are reviewed before they post.</p></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Goodwill Amortisation (FA-driven)</span></div><div class="sla-rule-body"><ul><li>FA runs depreciation on the goodwill asset book assigned to the adjustment ledger</li><li>Creates automated journal: Dr Goodwill Amortisation Expense / Cr Accumulated Amortisation</li><li>Primary ledger receives no goodwill amortisation — IFRS impairment only</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-cond">APPROVAL RULE</span><span class="sla-rule-name">Auto-Reversal for Pre-Consolidation Entries</span></div><div class="sla-rule-body"><ul><li>Configure auto-reversal for certain pre-consolidation entries that reverse in the following period (e.g., intercompany mark-up in closing inventory)</li><li>Prevents cumulative build-up of stale adjustments between periods</li><li>Close adjustment-only ledger before FCCS/HFM data load — enforce via period close checklist</li></ul></div></div></div>
+    <div id="12-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Pre-consolidation adjustments — goodwill amortisation and IC inventory mark-up elimination</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Adjustment Type</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (Stat)</span></td><td colspan="3" style="color:var(--ink4);font-style:italic">No entries — goodwill carried at cost under IFRS (impairment only)</td></tr><tr><td><span class="entry-ledger el-secondary">Adj Ledger</span></td><td><span class="entry-acct">7900 Goodwill Amortn</span></td><td class="entry-dr">Dr 25,000</td><td>Local GAAP 40yr amortisation</td></tr><tr><td><span class="entry-ledger el-secondary">Adj Ledger</span></td><td><span class="entry-acct">0900 Accum Amortn</span></td><td class="entry-cr">Cr 25,000</td><td>Accumulated amortisation</td></tr><tr><td><span class="entry-ledger el-secondary">Adj Ledger</span></td><td><span class="entry-acct">5000 COGS</span></td><td class="entry-dr">Dr 12,000</td><td>IC mark-up elimination in inventory</td></tr><tr><td><span class="entry-ledger el-secondary">Adj Ledger</span></td><td><span class="entry-acct">1300 Inventory</span></td><td class="entry-cr">Cr 12,000</td><td>Reduce inventory to group cost</td></tr></tbody></table></div>
+    <div id="12-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">−30%</span><span class="kpi-label">Consolidation preparation time</span></div><div class="kpi-card"><span class="kpi-value">+20%</span><span class="kpi-label">FCCS data quality score — pre-consolidation completeness</span></div><div class="kpi-card"><span class="kpi-value">−60%</span><span class="kpi-label">Manual consolidation adjustment journals outside Fusion</span></div><div class="kpi-card"><span class="kpi-value">−40%</span><span class="kpi-label">Restatement risk events due to missed pre-consolidation entries</span></div><div class="kpi-card"><span class="kpi-value">−50%</span><span class="kpi-label">Group audit findings on acquisition accounting</span></div></div></div>
+  </div>
+</div>
+
+<!-- UC 13 -->
+<div id="panel-13" class="uc-panel hidden">
+  <div class="uc-header">
+    <div class="uc-breadcrumb"><button class="back-btn" onclick="showOverview(null)">← All Use Cases</button><span class="uc-num">Use Case 13 of 13</span></div>
+    <div class="uc-title">Government Grants<br>IAS 20 Deferred (Primary) vs Immediate Recognition (Secondary)</div>
+    <div class="uc-badges"><span class="badge badge-oracle">Statutory</span><span class="badge badge-blue">AR / GL</span><span class="badge badge-gold">Subledger Conversion</span></div>
+    <div class="uc-nav-btns"><button class="uc-nav-btn active" onclick="showSection(13,'scenario',this)">Scenario</button><button class="uc-nav-btn" onclick="showSection(13,'config',this)">Config Steps</button><button class="uc-nav-btn" onclick="showSection(13,'sla',this)">SLA Rules</button><button class="uc-nav-btn" onclick="showSection(13,'entries',this)">Accounting Entries</button><button class="uc-nav-btn" onclick="showSection(13,'kpis',this)">KPIs</button></div>
+  </div>
+  <div class="uc-content">
+    <div id="13-scenario" class="section visible"><div class="section-title"><div class="section-icon" style="background:var(--oracle-pale)">📋</div>Scenario</div><div class="scenario-box"><p>An entity receiving government grants (infrastructure funding, R&amp;D grants, agricultural subsidies) accounts for them under IAS 20 in the primary ledger — deferred income recognised over the grant period or on a systematic basis. Local statutory reporting requires immediate income recognition on receipt. The same grant cash receipt produces two different accounting treatments.</p></div><div class="gap-box"><span class="gap-icon">⚠</span><div><span class="gap-label">R12 Gap</span><p>Grant accounting was largely outside core GL. Deferred grant schedules were maintained in spreadsheets. Statutory immediate recognition was a manual journal. Both reconciliations to actual grant authority reporting were entirely manual.</p></div></div></div>
+    <div id="13-config" class="section"><div class="section-title"><div class="section-icon" style="background:var(--blue-pale)">⚙️</div>Functional Configuration</div><div class="config-steps"><div class="config-step"><div class="step-line"><div class="step-circle">1</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Grants Management Integration — Primary</h4><p>Grants Management module drives deferred income schedule in primary ledger. Grant receipt posts to Deferred Grant Income (2600 liability). Periodic release JLR amortises to Grant Income Released (4800) over grant period.</p><span class="step-nav">Grants Management › Manage Awards</span></div></div><div class="config-step"><div class="step-line"><div class="step-circle">2</div><div class="step-connector"></div></div><div class="step-body"><h4>Configure Immediate Recognition — Secondary</h4><p>Secondary ledger has no deferral account. Grant receipt JLR posts full amount directly to Grant Income (5800). No periodic release schedule required in secondary. Asset deduction alternative also supported.</p></div></div></div></div>
+    <div id="13-sla" class="section"><div class="section-title"><div class="section-icon" style="background:var(--purple-pale)">🔧</div>SLA Rule Setup</div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Grant Receipt and Deferral — Primary (IAS 20)</span></div><div class="sla-rule-body"><ul><li>Event Class: Grant Receipt. Event Type: Cash Receipt / Award</li><li>JLR: Deferred Grant Income — Primary. Condition: Ledger = Primary. ADR: Deferred Grant Income 2600 (liability)</li><li>JLR: Grant Income Release — Primary. Event Type: Periodic Release. ADR: Grant Income Released 4800 (P&amp;L). Released over grant term</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Immediate Recognition — Secondary</span></div><div class="sla-rule-body"><ul><li>JLR: Immediate Grant Income — Secondary. Condition: Ledger = Secondary. ADR: Grant Income 5800 (full amount on receipt)</li><li>No deferral entry in secondary — full amount recognised immediately on cash receipt</li></ul></div></div><div class="sla-rule"><div class="sla-rule-header"><span class="sla-rule-type sla-type-jlr">JLR</span><span class="sla-rule-name">Asset Deduction Alternative (IAS 20)</span></div><div class="sla-rule-body"><ul><li>If primary uses asset deduction method: JLR credits Asset at gross, debits Grant Deduction contra account</li><li>Secondary: no asset deduction — records full asset at gross cost, full grant as income</li><li>Condition: Grant Type = ASSET_RELATED routes to asset deduction JLR in primary, income recognition in secondary</li></ul></div></div></div>
+    <div id="13-entries" class="section"><div class="section-title"><div class="section-icon" style="background:#081010">📊</div>Accounting Entry Examples</div><p style="font-size:13px;color:var(--ink3);margin-bottom:14px">Example: Government R&amp;D grant received 300,000 — IAS 20 deferred vs local immediate</p><table class="entry-table"><thead><tr><th>Ledger</th><th>Account</th><th>Debit/Credit</th><th>Basis</th></tr></thead><tbody><tr><td><span class="entry-ledger el-primary">Primary (IAS 20)</span></td><td><span class="entry-acct">1000 Cash</span></td><td class="entry-dr">Dr 300,000</td><td>Grant received</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IAS 20)</span></td><td><span class="entry-acct">2600 Deferred Grant</span></td><td class="entry-cr">Cr 300,000</td><td>Deferred over 3yr grant period</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IAS 20)</span></td><td><span class="entry-acct">2600 Deferred Grant</span></td><td class="entry-dr">Dr 100,000</td><td>Year 1 release (1/3)</td></tr><tr><td><span class="entry-ledger el-primary">Primary (IAS 20)</span></td><td><span class="entry-acct">4800 Grant Income</span></td><td class="entry-cr">Cr 100,000</td><td>Recognised year 1</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">1000 Cash</span></td><td class="entry-dr">Dr 300,000</td><td>Grant received</td></tr><tr><td><span class="entry-ledger el-secondary">Secondary (Stat)</span></td><td><span class="entry-acct">5800 Grant Income</span></td><td class="entry-cr">Cr 300,000</td><td>Full immediate recognition</td></tr></tbody></table></div>
+    <div id="13-kpis" class="section"><div class="section-title"><div class="section-icon" style="background:var(--green-pale)">📈</div>KPIs &amp; Expected Outcomes</div><div class="kpi-grid"><div class="kpi-card"><span class="kpi-value">100%</span><span class="kpi-label">Grant compliance rate — secondary ledger basis matches authority requirements</span></div><div class="kpi-card"><span class="kpi-value">−70%</span><span class="kpi-label">Audit adjustments on grant accounting</span></div><div class="kpi-card"><span class="kpi-value">−80%</span><span class="kpi-label">Manual grant journal entries — automated via Grants Management integration</span></div><div class="kpi-card"><span class="kpi-value">−25%</span><span class="kpi-label">Grant reporting cycle time for funding authority submissions</span></div><div class="kpi-card"><span class="kpi-value">&gt;99%</span><span class="kpi-label">IFRS investor reporting accuracy on grant income (primary ledger)</span></div></div></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+function showOverview(el) {
+  // hide all panels
+  document.querySelectorAll('.uc-panel, #panel-overview').forEach(p => p.classList.add('hidden'));
+  document.getElementById('panel-overview').classList.remove('hidden');
+  // update sidebar
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const overviewItem = document.querySelector('.sb-item[onclick="showOverview(this)"]');
+  if (overviewItem) overviewItem.classList.add('active');
+  // scroll main to top
+  document.querySelector('.main').scrollTop = 0;
+}
+
+function showCase(num, el) {
+  // hide all
+  document.querySelectorAll('.uc-panel, #panel-overview').forEach(p => p.classList.add('hidden'));
+  // show this panel
+  const panel = document.getElementById('panel-' + num);
+  if (panel) panel.classList.remove('hidden');
+  // update sidebar active
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (el) {
+    el.classList.add('active');
+  } else {
+    // find by onclick content
+    document.querySelectorAll('.sb-item').forEach(i => {
+      if (i.getAttribute('onclick') === 'showCase(' + num + ',this)') i.classList.add('active');
+    });
+  }
+  // reset to scenario tab
+  const scenarioBtn = panel.querySelector('.uc-nav-btn');
+  panel.querySelectorAll('.uc-nav-btn').forEach(b => b.classList.remove('active'));
+  if (scenarioBtn) scenarioBtn.classList.add('active');
+  // show scenario section
+  panel.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  const sc = document.getElementById(num + '-scenario');
+  if (sc) sc.classList.add('visible');
+  // scroll to top
+  document.querySelector('.main').scrollTop = 0;
+}
+
+function showSection(ucNum, sectionId, btn) {
+  const panel = document.getElementById('panel-' + ucNum);
+  // hide all sections in this panel
+  panel.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  // show target
+  const target = document.getElementById(ucNum + '-' + sectionId);
+  if (target) target.classList.add('visible');
+  // update buttons
+  panel.querySelectorAll('.uc-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
